@@ -12,119 +12,130 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
-    <style>
-        :root {
-            --primary-grad: linear-gradient(135deg, #da22ff 0%, #9733ee 100%);
-            --bg-color: #f4f7f6;
-            --danger: #ff4b5c;
-            --success: #2ecc71;
-            --gold: #d4af37;
-        }
+   <style>
+    :root {
+        /* Твой фирменный градиент */
+        --primary-grad: linear-gradient(135deg, #da22ff 0%, #9733ee 100%);
+        --bg-color: #000000; /* OLED Black */
+        --card-bg: #1c1c1e;  /* Apple Dark Card */
+        --danger: #ff453a;
+        --success: #32d74b;
+        --gold: #ffd60a;
+        --text-main: #ffffff;
+        --text-dim: #8e8e93;
+    }
 
-        body {
-            margin: 0; padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #222;
-            display: flex; justify-content: center;
-            height: 100vh; overflow: hidden;
-        }
+    body {
+        margin: 0; padding: 0;
+        /* Системный стек шрифтов Apple */
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+        background-color: var(--bg-color);
+        display: flex; justify-content: center;
+        height: 100vh; overflow: hidden;
+        color: var(--text-main);
+    }
 
-        #app-container {
-            width: 100%; max-width: 414px;
-            height: 100%; background-color: var(--bg-color);
-            position: relative; display: flex; flex-direction: column;
-            overflow: hidden;
-        }
+    #app-container {
+        width: 100%; max-width: 414px;
+        height: 100%; background-color: var(--bg-color);
+        position: relative; display: flex; flex-direction: column;
+        overflow: hidden;
+    }
 
-        header {
-            background: var(--primary-grad); color: white;
-            padding: 25px 20px 15px; text-align: center;
-            font-size: 1.2rem; font-weight: bold; z-index: 10;
-        }
+    header {
+        background: var(--primary-grad); color: white;
+        padding: 30px 20px 20px; text-align: center;
+        font-size: 1.1rem; font-weight: 700; z-index: 10;
+        letter-spacing: -0.5px;
+    }
 
-        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+    main { 
+        flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 120px; 
+        /* Плавный скролл */
+        -webkit-overflow-scrolling: touch;
+    }
 
-        .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        nav {
-            position: absolute; bottom: 0; width: 100%; height: 85px;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
-            display: flex; justify-content: space-around;
-            align-items: center; border-top: 1px solid #eee; z-index: 20;
-            padding-bottom: 15px;
-        }
+    /* Стеклянный навигатор */
+    nav {
+        position: absolute; bottom: 0; width: 100%; height: 90px;
+        background: rgba(28, 28, 30, 0.7); 
+        backdrop-filter: blur(20px) saturate(180%);
+        -webkit-backdrop-filter: blur(20px) saturate(180%);
+        display: flex; justify-content: space-around;
+        align-items: center; border-top: 0.5px solid rgba(255,255,255,0.1); z-index: 20;
+        padding-bottom: 20px;
+    }
 
-        nav button {
-            background: none; border: none; color: #aaa;
-            font-size: 0.7rem; display: flex; flex-direction: column; align-items: center;
-            cursor: pointer;
-        }
-        nav button.active { color: #9733ee; }
-        nav button i { font-size: 1.4rem; margin-bottom: 4px; }
+    nav button {
+        background: none; border: none; color: #636366;
+        font-size: 0.7rem; display: flex; flex-direction: column; align-items: center;
+        cursor: pointer; transition: all 0.3s ease;
+    }
+    
+    /* Градиент на активной иконке */
+    nav button.active { color: #da22ff; }
+    nav button i { font-size: 1.5rem; margin-bottom: 5px; }
 
-        .form-group { margin-bottom: 12px; position: relative; }
-        label { display: block; margin-bottom: 4px; font-weight: 500; color: #555; font-size: 0.85rem; }
-        input, select, textarea {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px;
-            box-sizing: border-box; font-size: 1rem; outline: none; background: white;
-            -webkit-appearance: none; font-family: inherit;
-        }
+    .form-group { margin-bottom: 16px; }
+    label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-dim); font-size: 0.8rem; padding-left: 4px; }
+    
+    input, select, textarea {
+        width: 100%; padding: 14px; 
+        border: 0.5px solid rgba(255,255,255,0.1); 
+        border-radius: 16px; /* Увеличенный радиус */
+        box-sizing: border-box; font-size: 1rem; outline: none; 
+        background: var(--card-bg); color: white;
+        font-family: inherit;
+    }
 
-        .btn-primary {
-            width: 100%; padding: 16px; background: var(--primary-grad);
-            color: white; border: none; border-radius: 12px;
-            font-size: 1rem; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(151, 51, 238, 0.3);
-        }
+    /* Моноширинные числа для цен и IMEI */
+    input[type="number"], .stat-val, .card-info p b {
+        font-variant-numeric: tabular-nums;
+    }
 
-        .card {
-            background: white; padding: 15px; border-radius: 16px;
-            margin-bottom: 12px; display: flex; gap: 15px; position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            cursor: pointer;
-        }
-        .card::before { content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 4px; border-radius: 0 4px 4px 0; }
-        .card.active::before { background: #9733ee; }
-        .card.sold::before { background: var(--success); }
+    .btn-primary {
+        width: 100%; padding: 18px; background: var(--primary-grad);
+        color: white; border: none; border-radius: 16px;
+        font-size: 1rem; font-weight: 700; cursor: pointer;
+        box-shadow: 0 8px 20px rgba(151, 51, 238, 0.3);
+        transition: transform 0.2s active;
+    }
+    .btn-primary:active { transform: scale(0.98); }
 
-        .card-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; background: #eee; }
-        .card-info { flex: 1; }
+    /* Карточки в стиле OLED */
+    .card {
+        background: var(--card-bg); padding: 16px; border-radius: 20px;
+        margin-bottom: 12px; display: flex; gap: 15px; position: relative;
+        border: 0.5px solid rgba(255,255,255,0.08);
+        box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .card::before { content: ''; position: absolute; left: 0; top: 20px; bottom: 20px; width: 4px; border-radius: 0 4px 4px 0; }
+    .card.active::before { background: #9733ee; box-shadow: 2px 0 10px #9733ee; }
+    .card.sold::before { background: var(--success); box-shadow: 2px 0 10px var(--success); }
 
-        #details-modal {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: none; justify-content: center;
-            align-items: center; z-index: 100; backdrop-filter: blur(5px);
-        }
-        .modal-content {
-            background: white; width: 90%; max-width: 380px; border-radius: 24px;
-            padding: 20px; position: relative; max-height: 85vh; overflow-y: auto;
-        }
-        
-        .photo-gallery { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scroll-snap-type: x mandatory; }
-        .photo-gallery img { width: 100%; height: 250px; flex-shrink: 0; border-radius: 16px; object-fit: cover; scroll-snap-align: start; }
+    .card-img { width: 75px; height: 75px; border-radius: 14px; object-fit: cover; background: #2c2c2e; }
 
-        .photo-upload {
-            width: 100%; height: 80px; border: 2px dashed #ddd; border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-size: 0.8rem; color: #aaa; cursor: pointer;
-        }
-        
-        .photo-preview-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .mini-preview { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+    /* Фильтры */
+    .filter-row { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding: 5px 0; scrollbar-width: none; }
+    .filter-btn { padding: 10px 20px; border-radius: 12px; border: none; background: #2c2c2e; color: var(--text-dim); font-size: 0.85rem; font-weight: 600; cursor: pointer; white-space: nowrap; }
+    .filter-btn.active { background: var(--primary-grad); color: white; }
 
-        .filter-row { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding: 5px 0; }
-        .filter-btn { padding: 8px 18px; border-radius: 20px; border: none; background: #eee; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
-        .filter-btn.active { background: var(--primary-grad); color: white; }
+    /* Сейф и Статистика */
+    .stat-card { background: var(--card-bg); padding: 18px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; border: 0.5px solid rgba(255,255,255,0.05); }
+    .stat-val { font-weight: 800; font-size: 1.3rem; letter-spacing: -0.5px; }
 
-        .stat-card { background: white; padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .stat-val { font-weight: bold; font-size: 1.2rem; }
-        
-        .data-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .btn-outline { background: white; border: 1px solid #ddd; padding: 12px; border-radius: 12px; font-size: 0.9rem; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
-    </style>
+    /* Модалка */
+    .modal-content {
+        background: #1c1c1e; color: white; width: 90%; border-radius: 28px;
+        padding: 24px; border: 0.5px solid rgba(255,255,255,0.15);
+    }
+</style>
 </head>
 <body>
 
@@ -463,3 +474,4 @@
 </script>
 </body>
 </html>
+
