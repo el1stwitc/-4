@@ -80,54 +80,61 @@
             box-shadow: 0 4px 15px rgba(151, 51, 238, 0.3);
         }
 
+        .btn-danger {
+            width: 100%; padding: 12px; background: #fff; color: var(--danger);
+            border: 1px solid var(--danger); border-radius: 12px;
+            font-size: 0.9rem; font-weight: bold; cursor: pointer; margin-top: 10px;
+        }
+
         .card {
             background: white; padding: 15px; border-radius: 16px;
             margin-bottom: 12px; display: flex; gap: 15px; position: relative;
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            cursor: pointer; transition: transform 0.2s;
+            cursor: pointer;
         }
-        .card:active { transform: scale(0.98); }
         .card::before { content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 4px; border-radius: 0 4px 4px 0; }
         .card.active::before { background: #9733ee; }
         .card.sold::before { background: var(--success); }
 
         .card-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; background: #eee; }
         .card-info { flex: 1; }
-        .card h3 { margin: 0 0 4px 0; font-size: 1rem; display: flex; justify-content: space-between; align-items: center; }
-        .card p { margin: 2px 0; font-size: 0.85rem; color: #777; }
 
-        /* Модальное окно (Детали товара) */
+        /* Модальное окно */
         #details-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.7); display: none; justify-content: center;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center;
             align-items: center; z-index: 100; backdrop-filter: blur(5px);
         }
         .modal-content {
-            background: white; width: 85%; max-width: 350px; border-radius: 24px;
-            padding: 20px; position: relative; max-height: 80vh; overflow-y: auto;
+            background: white; width: 90%; max-width: 380px; border-radius: 24px;
+            padding: 20px; position: relative; max-height: 85vh; overflow-y: auto;
         }
-        .modal-img { width: 100%; height: 200px; border-radius: 16px; object-fit: cover; margin-bottom: 15px; }
-        .modal-row { display: flex; justify-content: space-between; margin-bottom: 10px; border-bottom: 1px solid #f0f0f0; padding-bottom: 5px; }
-        .modal-label { color: #888; font-size: 0.8rem; }
-        .modal-val { font-weight: 600; font-size: 0.9rem; }
+        
+        /* Слайдер фото */
+        .photo-gallery { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scroll-snap-type: x mandatory; }
+        .photo-gallery img { width: 100%; height: 250px; flex-shrink: 0; border-radius: 16px; object-fit: cover; scroll-snap-align: start; }
+
+        .modal-row { display: flex; justify-content: space-between; margin-bottom: 8px; border-bottom: 1px solid #f5f5f5; padding-bottom: 4px; }
+        .modal-label { color: #888; font-size: 0.85rem; }
+        .modal-val { font-weight: 600; font-size: 0.95rem; }
+
+        .photo-preview-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .mini-preview { width: 60px; height: 60px; border-radius: 8px; object-fit: cover; border: 1px solid #ddd; }
+
+        .stat-card {
+            background: white; padding: 15px; border-radius: 16px; margin-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .stat-val { font-weight: bold; font-size: 1.2rem; }
 
         .filter-row { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding: 5px 0; }
-        .filter-btn { 
-            padding: 8px 18px; border-radius: 20px; border: none; background: #eee; 
-            font-size: 0.85rem; cursor: pointer; white-space: nowrap;
-        }
+        .filter-btn { padding: 8px 18px; border-radius: 20px; border: none; background: #eee; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
         .filter-btn.active { background: var(--primary-grad); color: white; }
 
         .photo-upload {
-            width: 100%; height: 100px; border: 2px dashed #ddd; border-radius: 12px;
-            display: flex; align-items: center; justify-content: center; font-size: 0.9rem;
-            color: #aaa; cursor: pointer; background-size: cover; background-position: center;
-        }
-
-        .data-actions { margin-top: 30px; display: flex; gap: 10px; justify-content: center; }
-        .btn-outline {
-            background: none; border: 1px solid #ccc; padding: 10px 15px;
-            border-radius: 10px; font-size: 0.8rem; color: #666; cursor: pointer;
+            width: 100%; height: 80px; border: 2px dashed #ddd; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            font-size: 0.8rem; color: #aaa; cursor: pointer;
         }
     </style>
 </head>
@@ -135,10 +142,11 @@
 
 <div id="details-modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
-        <img id="m-photo" src="" class="modal-img">
-        <h2 id="m-title" style="margin-top:0; margin-bottom:15px; font-size:1.2rem;"></h2>
+        <div id="m-gallery" class="photo-gallery"></div>
+        <h2 id="m-title" style="margin:0 0 15px 0; font-size:1.3rem;"></h2>
         <div id="m-details"></div>
-        <button class="btn-primary" style="margin-top:15px; padding:12px;" onclick="closeModal()">Закрыть</button>
+        <button class="btn-primary" style="margin-top:15px;" onclick="closeModal()">Закрыть</button>
+        <button id="btn-delete-item" class="btn-danger">Удалить товар из базы</button>
     </div>
 </div>
 
@@ -157,38 +165,33 @@
             </div>
 
             <div class="form-group">
-                <div id="photo-preview" class="photo-upload" onclick="document.getElementById('inp-photo').click()">
-                    <span><i class="fa-solid fa-camera"></i> Добавить фото</span>
+                <div class="photo-upload" onclick="document.getElementById('inp-photo').click()">
+                    <i class="fa-solid fa-images" style="font-size:1.5rem; margin-bottom:5px;"></i>
+                    <span>Добавить фото (можно несколько)</span>
                 </div>
-                <input type="file" id="inp-photo" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+                <input type="file" id="inp-photo" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
+                <div id="photo-preview-list" class="photo-preview-container"></div>
             </div>
 
             <div id="dynamic-form"></div>
 
             <div style="display:flex; gap:12px;">
-                <div class="form-group" style="flex:1">
-                    <label>Покупка (₽)</label>
-                    <input type="number" id="inp-buy" placeholder="Цена">
-                </div>
-                <div class="form-group" style="flex:1">
-                    <label>Ремонт (₽)</label>
-                    <input type="number" id="inp-repair" value="0">
-                </div>
+                <div class="form-group" style="flex:1"><label>Покупка</label><input type="number" id="inp-buy"></div>
+                <div class="form-group" style="flex:1"><label>Ремонт</label><input type="number" id="inp-repair" value="0"></div>
             </div>
 
             <div class="form-group">
-                <label>Комментарий (опционально)</label>
-                <textarea id="inp-comment" rows="2" placeholder="Напр: Треснуто стекло, чехол в комплекте..."></textarea>
+                <label>Комментарий</label>
+                <textarea id="inp-comment" rows="2" placeholder="Любые детали..."></textarea>
             </div>
-
             <button class="btn-primary" onclick="addItem()">Добавить товар</button>
         </div>
 
         <div id="tab-sell" class="tab-content">
-            <div class="form-group"><label>Поиск</label><input type="text" id="sell-search" placeholder="Модель или IMEI..." oninput="renderSellList()"></div>
-            <div class="form-group"><label>Товар в наличии</label><select id="sell-select"></select></div>
-            <div class="form-group"><label>Цена продажи (₽)</label><input type="number" id="sell-price" placeholder="Сумма сделки"></div>
-            <button class="btn-primary" onclick="completeSell()">Оформить продажу</button>
+            <div class="form-group"><label>Поиск</label><input type="text" id="sell-search" placeholder="Поиск по IMEI или модели..." oninput="renderSellList()"></div>
+            <div class="form-group"><label>В наличии</label><select id="sell-select"></select></div>
+            <div class="form-group"><label>Цена продажи</label><input type="number" id="sell-price"></div>
+            <button class="btn-primary" onclick="completeSell()">Продать</button>
         </div>
 
         <div id="tab-base" class="tab-content">
@@ -201,39 +204,18 @@
         </div>
 
         <div id="tab-stats" class="tab-content">
-            <div style="background:white; border-radius:16px; padding:15px; height:200px; margin-bottom:15px;">
-                <canvas id="statChart"></canvas>
-            </div>
-            
-            <div class="stat-card">
-                <span style="color:#777">Чистая прибыль:</span>
-                <span id="stat-profit" class="stat-val">0 ₽</span>
-            </div>
-            <div class="stat-card">
-                <span style="color:#777">ROI окупаемость:</span>
-                <span id="stat-roi" class="stat-val">0%</span>
-            </div>
-            <div class="stat-card">
-                <span style="color:#777">Сделок:</span>
-                <span id="stat-count" class="stat-val">0</span>
-            </div>
-            
-            <div class="filter-row" style="justify-content:center;">
-                <button onclick="updateStats('1m', this)" class="filter-btn active">Месяц</button>
-                <button onclick="updateStats('3m', this)" class="filter-btn">3 месяца</button>
-                <button onclick="updateStats('1y', this)" class="filter-btn">Год</button>
-            </div>
-
+            <div style="background:white; border-radius:16px; padding:15px; height:200px; margin-bottom:15px;"><canvas id="statChart"></canvas></div>
+            <div class="stat-card"><span>Прибыль:</span><span id="stat-profit" class="stat-val">0 ₽</span></div>
+            <div class="stat-card"><span>ROI:</span><span id="stat-roi" class="stat-val">0%</span></div>
+            <div class="stat-card"><span>Сделок:</span><span id="stat-count" class="stat-val">0</span></div>
             <div class="data-actions">
-                <button class="btn-outline" onclick="downloadBackup()"><i class="fa-solid fa-download"></i> Экспорт</button>
-                <button class="btn-outline" onclick="document.getElementById('import-file').click()"><i class="fa-solid fa-upload"></i> Импорт</button>
-                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importBackup(this)">
+                <button class="btn-outline" onclick="downloadBackup()">Экспорт</button>
+                <button class="btn-outline" onclick="document.getElementById('import-file').click()">Импорт</button>
+                <input type="file" id="import-file" style="display:none" onchange="importBackup(this)">
             </div>
         </div>
 
-        <div id="tab-history" class="tab-content">
-            <div id="history-list"></div>
-        </div>
+        <div id="tab-history" class="tab-content"><div id="history-list"></div></div>
     </main>
 
     <nav>
@@ -246,9 +228,9 @@
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('resell_db_final')) || [];
-    let logs = JSON.parse(localStorage.getItem('resell_logs_final')) || [];
-    let tempPhoto = "";
+    let db = JSON.parse(localStorage.getItem('resell_db_v6')) || [];
+    let logs = JSON.parse(localStorage.getItem('resell_logs_v6')) || [];
+    let tempPhotos = [];
     let chartObj = null;
 
     function showTab(name, btn) {
@@ -256,55 +238,53 @@
         document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
         document.getElementById('tab-' + name).classList.add('active');
         btn.classList.add('active');
-        
-        const titles = {add: "Новое устройство", sell: "Оформление продажи", base: "Склад", stats: "Финансовый отчет", history: "История операций"};
-        document.getElementById('header-title').innerText = titles[name];
-        
         if(name === 'sell') renderSellList();
         if(name === 'base') renderBase('phone', document.querySelector('.filter-btn'));
-        if(name === 'stats') updateStats('1m', document.querySelectorAll('.filter-btn')[3]);
+        if(name === 'stats') updateStats();
         if(name === 'history') renderHistory();
     }
 
     function renderAddForm() {
         const type = document.getElementById('add-type').value;
         const div = document.getElementById('dynamic-form');
-        const placeholders = {
-            phone: { b: "Apple", m: "iPhone 14 Pro", i: "IMEI или S/N", mem: "128" },
-            headphones: { b: "Apple", m: "AirPods Pro 2", i: "Серийный номер" },
-            watch: { b: "Apple", m: "Watch S8 45mm", i: "Серийный номер" }
-        };
-        const p = placeholders[type];
-
-        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" placeholder="${p.b}"></div>
-                 <div class="form-group"><label>Модель</label><input id="b-model" placeholder="${p.m}"></div>
-                 <div class="form-group"><label>Цвет</label><input id="b-color" placeholder="Напр: Тёмный"></div>`;
-        
-        if(type === 'phone') {
-            h += `<div class="form-group"><label>Память (Гб)</label><input type="number" id="b-memory" placeholder="${p.mem}"></div>`;
-        }
-        
-        h += `<div class="form-group"><label>${type === 'phone' ? 'IMEI / S/N' : 'Серийный номер'}</label><input id="b-imei" placeholder="${p.i}"></div>`;
+        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" placeholder="Apple"></div>
+                 <div class="form-group"><label>Модель</label><input id="b-model" placeholder="iPhone..."></div>
+                 <div class="form-group"><label>Цвет</label><input id="b-color"></div>`;
+        if(type === 'phone') h += `<div class="form-group"><label>Память (Гб)</label><input type="number" id="b-memory"></div>`;
+        h += `<div class="form-group"><label>IMEI / S/N</label><input id="b-imei"></div>`;
         div.innerHTML = h;
     }
     renderAddForm();
 
-    function handlePhoto(input) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const img = new Image();
-            img.src = e.target.result;
-            img.onload = () => {
-                const canvas = document.createElement('canvas');
-                const ctx = canvas.getContext('2d');
-                canvas.width = 400; canvas.height = 400;
-                ctx.drawImage(img, 0, 0, 400, 400);
-                tempPhoto = canvas.toDataURL('image/jpeg', 0.7);
-                document.getElementById('photo-preview').style.backgroundImage = `url(${tempPhoto})`;
-                document.getElementById('photo-preview').innerHTML = "";
+    async function handlePhotos(input) {
+        tempPhotos = [];
+        const files = Array.from(input.files);
+        const preview = document.getElementById('photo-preview-list');
+        preview.innerHTML = "";
+
+        for (let file of files) {
+            const data = await readFile(file);
+            tempPhotos.push(data);
+            preview.innerHTML += `<img src="${data}" class="mini-preview">`;
+        }
+    }
+
+    function readFile(file) {
+        return new Promise(res => {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                const img = new Image();
+                img.src = e.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const ctx = canvas.getContext('2d');
+                    canvas.width = 600; canvas.height = 600;
+                    ctx.drawImage(img, 0, 0, 600, 600);
+                    res(canvas.toDataURL('image/jpeg', 0.7));
+                };
             };
-        };
-        reader.readAsDataURL(input.files[0]);
+            reader.readAsDataURL(file);
+        });
     }
 
     function addItem() {
@@ -316,21 +296,18 @@
             model: document.getElementById('b-model').value,
             color: document.getElementById('b-color').value,
             imei: document.getElementById('b-imei').value,
-            memory: document.getElementById('b-memory') ? document.getElementById('b-memory').value : '',
+            memory: document.getElementById('b-memory')?.value || '',
             buy: parseFloat(document.getElementById('inp-buy').value || 0),
             rep: parseFloat(document.getElementById('inp-repair').value || 0),
             comment: document.getElementById('inp-comment').value,
-            photo: tempPhoto,
+            photos: tempPhotos,
             status: 'stock',
             date: new Date().toISOString()
         };
-
         if(!item.brand || !item.buy) return alert("Заполни бренд и цену!");
-
         db.push(item);
         logs.unshift({t: `Приход: ${item.brand} ${item.model}`, d: new Date().toLocaleString(), type:'in'});
         save();
-        alert("Товар добавлен!");
         location.reload();
     }
 
@@ -339,95 +316,81 @@
             document.querySelectorAll('#tab-base .filter-btn').forEach(b => b.classList.remove('active'));
             btn.classList.add('active');
         }
-        const list = document.getElementById('base-list');
         const filtered = db.filter(i => i.type === type);
-        
-        list.innerHTML = filtered.map(i => {
-            const cost = i.buy + i.rep;
-            const profit = i.status === 'sold' ? i.sellPrice - cost : 0;
-            const color = profit >= 0 ? 'var(--success)' : 'var(--danger)';
-            
-            return `<div class="card ${i.status === 'stock' ? 'active' : 'sold'}" onclick="openModal(${i.id})">
-                <img src="${i.photo || 'https://via.placeholder.com/70?text=Нет+фото'}" class="card-img">
+        document.getElementById('base-list').innerHTML = filtered.map(i => `
+            <div class="card ${i.status === 'stock' ? 'active' : 'sold'}" onclick="openModal(${i.id})">
+                <img src="${i.photos[0] || 'https://via.placeholder.com/70'}" class="card-img">
                 <div class="card-info">
-                    <h3 style="margin-bottom:2px;">${i.brand} ${i.model} 
-                        ${i.status === 'sold' ? `<span style="font-size:0.8rem; color:${color}; font-weight:900;">+${((profit/cost)*100).toFixed(0)}% ROI</span>` : ''}
-                    </h3>
-                    <p>${i.memory ? i.memory+'Gb | ' : ''}${i.color}</p>
-                    ${i.status === 'sold' 
-                        ? `<p style="color:${color}; font-weight:bold; font-size:1rem;">Прибыль: ${profit} ₽</p>` 
-                        : `<p style="color:var(--gold); font-weight:500;">Себестоимость: ${cost} ₽</p>`}
+                    <h3 style="margin:0;">${itemTitle(i)}</h3>
+                    <p style="margin:2px 0; font-size:0.8rem;">${i.color} ${i.memory ? '| '+i.memory+'Gb' : ''}</p>
+                    <p style="color:${i.status==='sold'?'var(--success)':'var(--gold)'}; font-weight:bold;">
+                        ${i.status==='sold' ? (i.sellPrice-(i.buy+i.rep))+' ₽' : (i.buy+i.rep)+' ₽'}
+                    </p>
                 </div>
-            </div>`;
-        }).join('');
+            </div>
+        `).join('');
     }
+
+    function itemTitle(i) { return `${i.brand} ${i.model}`; }
 
     function openModal(id) {
         const item = db.find(i => i.id == id);
         if(!item) return;
 
-        document.getElementById('m-photo').src = item.photo || 'https://via.placeholder.com/200?text=Нет+фото';
-        document.getElementById('m-title').innerText = `${item.brand} ${item.model}`;
+        const gallery = document.getElementById('m-gallery');
+        gallery.innerHTML = item.photos.length ? item.photos.map(p => `<img src="${p}">`).join('') : '<img src="https://via.placeholder.com/300?text=Нет+фото">';
         
-        let details = `
-            <div class="modal-row"><span class="modal-label">Цвет</span><span class="modal-val">${item.color}</span></div>
-            ${item.memory ? `<div class="modal-row"><span class="modal-label">Память</span><span class="modal-val">${item.memory} Гб</span></div>` : ''}
-            <div class="modal-row"><span class="modal-label">IMEI / SN</span><span class="modal-val">${item.imei}</span></div>
-            <div class="modal-row"><span class="modal-label">Статус</span><span class="modal-val">${item.status === 'stock' ? 'В наличии' : 'Продано'}</span></div>
-            <div class="modal-row"><span class="modal-label">Цена закупки</span><span class="modal-val">${item.buy} ₽</span></div>
+        document.getElementById('m-title').innerText = itemTitle(item);
+        document.getElementById('m-details').innerHTML = `
+            <div class="modal-row"><span class="modal-label">IMEI/SN</span><span class="modal-val">${item.imei}</span></div>
+            <div class="modal-row"><span class="modal-label">Закупка</span><span class="modal-val">${item.buy} ₽</span></div>
             <div class="modal-row"><span class="modal-label">Ремонт</span><span class="modal-val">${item.rep} ₽</span></div>
-            ${item.status === 'sold' ? `<div class="modal-row"><span class="modal-label">Цена продажи</span><span class="modal-val" style="color:var(--success)">${item.sellPrice} ₽</span></div>` : ''}
-            <div style="margin-top:15px;">
-                <span class="modal-label">Комментарий:</span>
-                <p style="font-size:0.9rem; color:#333; margin: 5px 0;">${item.comment || 'Нет комментариев'}</p>
-            </div>
+            ${item.status === 'sold' ? `<div class="modal-row"><span class="modal-label">Продажа</span><span class="modal-val">${item.sellPrice} ₽</span></div>` : ''}
+            <div style="margin-top:10px;"><small style="color:#888">Заметки:</small><p style="margin:4px 0; font-size:0.9rem;">${item.comment || '-'}</p></div>
         `;
-        
-        document.getElementById('m-details').innerHTML = details;
+
+        document.getElementById('btn-delete-item').onclick = () => deleteItem(item.id);
         document.getElementById('details-modal').style.display = 'flex';
     }
 
-    function closeModal() {
-        document.getElementById('details-modal').style.display = 'none';
+    function deleteItem(id) {
+        if(confirm("Удалить этот товар навсегда? Это действие нельзя отменить.")) {
+            db = db.filter(i => i.id !== id);
+            logs.unshift({t: `Удаление товара`, d: new Date().toLocaleString(), type:'out'});
+            save();
+            closeModal();
+            location.reload();
+        }
     }
 
-    // Остальные функции (Продажа, Статистика, Бэкап) без изменений...
+    function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
+
     function renderSellList() {
         const search = document.getElementById('sell-search').value.toLowerCase();
-        const sel = document.getElementById('sell-select');
-        const active = db.filter(i => i.status === 'stock' && (`${i.brand} ${i.model} ${i.imei}`).toLowerCase().includes(search));
-        sel.innerHTML = active.map(i => `<option value="${i.id}">${i.brand} ${i.model} (${i.buy + i.rep}₽)</option>`).join('');
+        const active = db.filter(i => i.status === 'stock' && (i.brand + i.model + i.imei).toLowerCase().includes(search));
+        document.getElementById('sell-select').innerHTML = active.map(i => `<option value="${i.id}">${i.brand} ${i.model} (${i.buy+i.rep}₽)</option>`).join('');
     }
 
     function completeSell() {
         const id = document.getElementById('sell-select').value;
         const price = parseFloat(document.getElementById('sell-price').value);
-        if(!id || !price) return alert("Выбери товар и цену!");
+        if(!id || !price) return alert("Данные!");
         const idx = db.findIndex(i => i.id == id);
         db[idx].status = 'sold';
         db[idx].sellPrice = price;
         db[idx].sellDate = new Date().toISOString();
-        logs.unshift({t: `Продажа: ${db[idx].brand} ${db[idx].model}`, d: new Date().toLocaleString(), type:'out'});
+        logs.unshift({t: `Продано: ${db[idx].brand}`, d: new Date().toLocaleString(), type:'out'});
         save();
-        alert("Успешно продано!");
-        showTab('stats', document.querySelectorAll('nav button')[3]);
+        location.reload();
     }
 
-    function updateStats(period, btn) {
-        if(btn) {
-            document.querySelectorAll('#tab-stats .filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
+    function updateStats() {
         const sold = db.filter(i => i.status === 'sold');
-        let totalProfit = 0, totalCost = 0;
-        sold.forEach(i => {
-            totalProfit += (i.sellPrice - (i.buy + i.rep));
-            totalCost += (i.buy + i.rep);
-        });
-        const profitEl = document.getElementById('stat-profit');
-        profitEl.innerText = totalProfit + " ₽";
-        profitEl.style.color = totalProfit >= 0 ? "var(--success)" : "var(--danger)";
-        document.getElementById('stat-roi').innerText = totalCost > 0 ? ((totalProfit/totalCost)*100).toFixed(1) + "%" : "0%";
+        let prof = 0, cost = 0;
+        sold.forEach(i => { prof += (i.sellPrice - (i.buy+i.rep)); cost += (i.buy+i.rep); });
+        document.getElementById('stat-profit').innerText = prof + " ₽";
+        document.getElementById('stat-profit').style.color = prof >= 0 ? "var(--success)" : "var(--danger)";
+        document.getElementById('stat-roi').innerText = cost > 0 ? ((prof/cost)*100).toFixed(1) + "%" : "0%";
         document.getElementById('stat-count').innerText = sold.length;
         renderChart(sold);
     }
@@ -439,49 +402,37 @@
             type: 'line',
             data: {
                 labels: data.map(i => new Date(i.sellDate).toLocaleDateString()),
-                datasets: [{ label: 'Прибыль', data: data.map(i => i.sellPrice - (i.buy+i.rep)), borderColor: '#9733ee', backgroundColor: 'rgba(151, 51, 238, 0.1)', fill: true, tension: 0.4 }]
+                datasets: [{ label: 'Profit', data: data.map(i => i.sellPrice - (i.buy+i.rep)), borderColor: '#9733ee', tension: 0.4 }]
             },
-            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+            options: { responsive: true, maintainAspectRatio: false }
         });
     }
 
     function renderHistory() {
         document.getElementById('history-list').innerHTML = logs.map(l => `
             <div class="stat-card" style="border-left: 4px solid ${l.type==='in'?'#9733ee':'#2ecc71'}">
-                <div style="font-size:0.9rem;"><b>${l.t}</b><br><small style="color:#999">${l.d}</small></div>
+                <div style="font-size:0.85rem;"><b>${l.t}</b><br><small>${l.d}</small></div>
             </div>
         `).join('');
     }
 
     function save() {
-        localStorage.setItem('resell_db_final', JSON.stringify(db));
-        localStorage.setItem('resell_logs_final', JSON.stringify(logs));
+        localStorage.setItem('resell_db_v6', JSON.stringify(db));
+        localStorage.setItem('resell_logs_v6', JSON.stringify(logs));
     }
 
     function downloadBackup() {
-        const data = { db, logs, version: "5.0", exportDate: new Date().toLocaleString() };
-        const blob = new Blob([JSON.stringify(data)], {type: "application/json"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `resell_backup_${new Date().toLocaleDateString()}.json`;
-        a.click();
+        const blob = new Blob([JSON.stringify({db, logs})], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'resell_data.json'; a.click();
     }
 
     function importBackup(input) {
-        const file = input.files[0];
-        if (!file) return;
         const reader = new FileReader();
         reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (data.db && data.logs) {
-                    db = data.db; logs = data.logs; save();
-                    alert("Данные восстановлены!"); location.reload();
-                }
-            } catch (err) { alert("Ошибка файла"); }
+            const data = JSON.parse(e.target.result);
+            db = data.db; logs = data.logs; save(); location.reload();
         };
-        reader.readAsText(file);
+        reader.readAsText(input.files[0]);
     }
 </script>
 </body>
