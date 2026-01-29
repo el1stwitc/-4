@@ -93,7 +93,6 @@
         .card-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; background: #eee; }
         .card-info { flex: 1; }
 
-        /* Модальное окно */
         #details-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: rgba(0,0,0,0.8); display: none; justify-content: center;
@@ -122,6 +121,9 @@
 
         .stat-card { background: white; padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
         .stat-val { font-weight: bold; font-size: 1.2rem; }
+        
+        .data-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-outline { background: white; border: 1px solid #ddd; padding: 12px; border-radius: 12px; font-size: 0.9rem; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
     </style>
 </head>
 <body>
@@ -196,8 +198,15 @@
             <div class="stat-card"><span>Прибыль:</span><span id="stat-profit" class="stat-val">0 ₽</span></div>
             <div class="stat-card"><span>ROI:</span><span id="stat-roi" class="stat-val">0%</span></div>
             <div class="stat-card"><span>Сделок:</span><span id="stat-count" class="stat-val">0</span></div>
-            <div style="text-align:center; margin-top:20px;">
-                <button class="filter-btn" onclick="downloadBackup()">Экспорт данных (JSON)</button>
+            
+            <div class="data-actions">
+                <button class="btn-outline" onclick="downloadBackup()">
+                    <i class="fa-solid fa-file-export"></i> Экспорт базы (JSON)
+                </button>
+                <button class="btn-outline" onclick="document.getElementById('import-file').click()">
+                    <i class="fa-solid fa-file-import"></i> Импорт данных
+                </button>
+                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importBackup(this)">
             </div>
         </div>
 
@@ -214,7 +223,6 @@
 </div>
 
 <script>
-    // ГИГАНТСКАЯ БАЗА ДАННЫХ
     const GLOBAL_DATABASE = {
         brands: ["Apple", "Samsung", "Xiaomi", "Google", "Huawei", "Honor", "Sony", "Realme", "OnePlus", "Nothing"],
         models: {
@@ -224,17 +232,13 @@
                 "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14", "iPhone 13 Pro Max", 
                 "iPhone 13", "iPhone 13 mini", "iPhone 12 Pro", "iPhone 12", "iPhone 11",
                 "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24", "Galaxy S23 Ultra", "Galaxy S22 Ultra",
-                "Redmi Note 13 Pro", "Poco F6 Pro", "Poco X6 Pro", "Xiaomi 14 Ultra",
-                "Pixel 9 Pro XL", "Pixel 9 Pro", "Pixel 8 Pro", "Pixel 7a"
+                "Redmi Note 13 Pro", "Poco F6 Pro", "Poco X6 Pro", "Xiaomi 14 Ultra"
             ],
             headphones: [
-                "AirPods Pro 2 (USB-C)", "AirPods Pro 2", "AirPods 4 (ANC)", "AirPods 4", "AirPods 3", "AirPods 2", "AirPods Max",
-                "Galaxy Buds 3 Pro", "Galaxy Buds 2 Pro", "Sony WH-1000XM5", "Sony WF-1000XM5", "Huawei FreeBuds Pro 3"
+                "AirPods Pro 2", "AirPods 4 (ANC)", "AirPods 3", "AirPods Max", "Galaxy Buds 3 Pro", "Sony WH-1000XM5"
             ],
             watch: [
-                "Apple Watch Ultra 2", "Apple Watch Ultra", "Apple Watch Series 10", "Apple Watch Series 9",
-                "Apple Watch Series 8", "Apple Watch SE 2", "Galaxy Watch 7", "Galaxy Watch 6 Classic",
-                "Huawei Watch GT 4", "Amazfit GTR 4"
+                "Apple Watch Ultra 2", "Apple Watch Series 10", "Apple Watch Series 9", "Galaxy Watch 7", "Huawei Watch GT 4"
             ]
         }
     };
@@ -254,15 +258,14 @@
     function renderAddForm() {
         const type = document.getElementById('add-type').value;
         const div = document.getElementById('dynamic-form');
-        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" list="brands-dl" placeholder="Напр: Apple"></div>
-                 <div class="form-group"><label>Модель</label><input id="b-model" list="models-dl" placeholder="Напр: iPhone 15"></div>
-                 <div class="form-group"><label>Цвет</label><input id="b-color" placeholder="Напр: Тёмный"></div>`;
-        if(type === 'phone') h += `<div class="form-group"><label>Память (Гб)</label><input type="number" id="b-memory" placeholder="128"></div>`;
-        h += `<div class="form-group"><label>IMEI / S/N</label><input id="b-imei" placeholder="Уникальный номер"></div>`;
+        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" list="brands-dl" placeholder="Apple"></div>
+                 <div class="form-group"><label>Модель</label><input id="b-model" list="models-dl" placeholder="iPhone 15"></div>
+                 <div class="form-group"><label>Цвет</label><input id="b-color" placeholder="Space Black"></div>`;
+        if(type === 'phone') h += `<div class="form-group"><label>Память (Гб)</label><input type="number" id="b-memory" placeholder="256"></div>`;
+        h += `<div class="form-group"><label>IMEI / S/N</label><input id="b-imei" placeholder="Номер"></div>`;
         div.innerHTML = h;
     }
 
-    // Инициализация при загрузке
     updateDatalists();
     renderAddForm();
 
@@ -312,9 +315,9 @@
             status: 'stock',
             date: new Date().toISOString()
         };
-        if(!item.brand || !item.buy) return alert("Бренд и цена закупки обязательны!");
+        if(!item.brand || !item.buy) return alert("Бренд и цена обязательны!");
         db.push(item);
-        logs.unshift({t: `Приход: ${item.brand} ${item.model}`, d: new Date().toLocaleString(), type:'in'});
+        logs.unshift({t: `+ ${item.brand} ${item.model}`, d: new Date().toLocaleString(), type:'in'});
         save();
         location.reload();
     }
@@ -347,7 +350,7 @@
                     </p>
                 </div>
             </div>
-        `).join('') : '<p style="text-align:center; color:#999; margin-top:50px;">На складе пусто</p>';
+        `).join('') : '<p style="text-align:center; color:#999; margin-top:50px;">Пусто</p>';
     }
 
     function openModal(id) {
@@ -358,16 +361,16 @@
         document.getElementById('m-title').innerText = `${item.brand} ${item.model}`;
         document.getElementById('m-details').innerHTML = `
             <div class="modal-row"><span class="modal-label">IMEI/SN</span><span class="modal-val">${item.imei || '-'}</span></div>
-            <div class="modal-row"><span class="modal-label">Себестоимость</span><span class="modal-val">${item.buy + item.rep} ₽</span></div>
-            ${item.status === 'sold' ? `<div class="modal-row"><span class="modal-label">Цена продажи</span><span class="modal-val" style="color:var(--success)">${item.sellPrice} ₽</span></div>` : ''}
-            <div style="margin-top:10px;"><small style="color:#888">Заметки:</small><p style="margin:4px 0; font-size:0.9rem;">${item.comment || 'Нет записей'}</p></div>
+            <div class="modal-row"><span class="modal-label">Затраты</span><span class="modal-val">${item.buy + item.rep} ₽</span></div>
+            ${item.status === 'sold' ? `<div class="modal-row"><span class="modal-label">Продажа</span><span class="modal-val" style="color:var(--success)">${item.sellPrice} ₽</span></div>` : ''}
+            <div style="margin-top:10px;"><small style="color:#888">Заметки:</small><p style="margin:4px 0; font-size:0.9rem;">${item.comment || '-'}</p></div>
         `;
         document.getElementById('btn-delete-item').onclick = () => deleteItem(item.id);
         document.getElementById('details-modal').style.display = 'flex';
     }
 
     function deleteItem(id) {
-        if(confirm("Удалить товар?")) {
+        if(confirm("Удалить?")) {
             db = db.filter(i => i.id !== id);
             save(); closeModal(); location.reload();
         }
@@ -384,12 +387,12 @@
     function completeSell() {
         const id = document.getElementById('sell-select').value;
         const price = parseFloat(document.getElementById('sell-price').value);
-        if(!id || !price) return alert("Выберите товар и цену!");
+        if(!id || !price) return alert("Данные!");
         const idx = db.findIndex(i => i.id == id);
         db[idx].status = 'sold';
         db[idx].sellPrice = price;
         db[idx].sellDate = new Date().toISOString();
-        logs.unshift({t: `Продажа: ${db[idx].model}`, d: new Date().toLocaleString(), type:'out'});
+        logs.unshift({t: `Продано: ${db[idx].model}`, d: new Date().toLocaleString(), type:'out'});
         save(); location.reload();
     }
 
@@ -433,6 +436,29 @@
     function downloadBackup() {
         const blob = new Blob([JSON.stringify({db, logs})], {type: "application/json"});
         const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'resell_backup.json'; a.click();
+    }
+
+    function importBackup(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.db && data.logs) {
+                    db = data.db; 
+                    logs = data.logs; 
+                    save(); 
+                    alert("Данные успешно импортированы!"); 
+                    location.reload();
+                } else {
+                    alert("Ошибка: Неверный формат файла.");
+                }
+            } catch (err) {
+                alert("Ошибка при чтении файла.");
+            }
+        };
+        reader.readAsText(file);
     }
 </script>
 </body>
