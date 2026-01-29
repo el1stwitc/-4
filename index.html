@@ -3,204 +3,285 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resell Pro v10 Ultimate</title>
+    <title>Resell Pro Database Edition</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
+    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
     <style>
         :root {
             --primary-grad: linear-gradient(135deg, #da22ff 0%, #9733ee 100%);
             --bg-color: #f4f7f6;
             --danger: #ff4b5c;
             --success: #2ecc71;
-            --warning: #f1c40f;
-            --info: #3498db;
+            --gold: #d4af37;
         }
-        body { margin: 0; font-family: -apple-system, sans-serif; background-color: #222; height: 100vh; overflow: hidden; display: flex; justify-content: center; }
-        #app-container { width: 100%; max-width: 414px; height: 100%; background: var(--bg-color); position: relative; display: flex; flex-direction: column; overflow: hidden; }
-        header { background: var(--primary-grad); color: white; padding: 20px; text-align: center; font-weight: bold; }
-        main { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 100px; }
+
+        body {
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: #222;
+            display: flex; justify-content: center;
+            height: 100vh; overflow: hidden;
+        }
+
+        #app-container {
+            width: 100%; max-width: 414px;
+            height: 100%; background-color: var(--bg-color);
+            position: relative; display: flex; flex-direction: column;
+            overflow: hidden;
+        }
+
+        header {
+            background: var(--primary-grad); color: white;
+            padding: 25px 20px 15px; text-align: center;
+            font-size: 1.2rem; font-weight: bold; z-index: 10;
+        }
+
+        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+
         .tab-content { display: none; }
-        .tab-content.active { display: block; }
-        
-        .form-group { background: white; padding: 12px; border-radius: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        label { display: block; font-size: 0.75rem; font-weight: bold; color: #777; margin-bottom: 5px; }
-        input, select, textarea { width: 100%; padding: 10px; border: 1px solid #eee; border-radius: 8px; font-size: 0.9rem; outline: none; box-sizing: border-box; }
-        
-        /* Карта дефектов */
-        #damage-map { width: 150px; height: 260px; border: 2px solid #ddd; border-radius: 20px; margin: 10px auto; position: relative; background: #fff; background-image: linear-gradient(#eee 1px, transparent 1px), linear-gradient(90deg, #eee 1px, transparent 1px); background-size: 20px 20px; }
-        .damage-point { position: absolute; width: 12px; height: 12px; background: var(--danger); border-radius: 50%; transform: translate(-50%, -50%); border: 2px solid white; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
 
-        .card { background: white; padding: 12px; border-radius: 16px; margin-bottom: 10px; display: flex; gap: 12px; position: relative; border-left: 5px solid transparent; }
-        .card.stock { border-left-color: var(--warning); }
-        .card.reserve { border-left-color: var(--info); }
-        .card.sold { border-left-color: var(--success); }
-        .card.stale { border: 2px solid var(--danger); }
-        
-        .badge { position: absolute; right: 10px; top: 10px; font-size: 0.6rem; padding: 2px 6px; border-radius: 4px; color: white; }
-        
-        nav { position: absolute; bottom: 0; width: 100%; height: 80px; background: white; display: flex; justify-content: space-around; align-items: center; border-top: 1px solid #eee; padding-bottom: 10px; }
-        nav button { background: none; border: none; color: #ccc; font-size: 0.7rem; display: flex; flex-direction: column; align-items: center; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        nav {
+            position: absolute; bottom: 0; width: 100%; height: 85px;
+            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            display: flex; justify-content: space-around;
+            align-items: center; border-top: 1px solid #eee; z-index: 20;
+            padding-bottom: 15px;
+        }
+
+        nav button {
+            background: none; border: none; color: #aaa;
+            font-size: 0.7rem; display: flex; flex-direction: column; align-items: center;
+            cursor: pointer;
+        }
         nav button.active { color: #9733ee; }
-        nav button i { font-size: 1.4rem; margin-bottom: 3px; }
+        nav button i { font-size: 1.4rem; margin-bottom: 4px; }
 
-        .btn-primary { width: 100%; padding: 15px; background: var(--primary-grad); color: white; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
-        .checklist { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; font-size: 0.8rem; }
+        .form-group { margin-bottom: 12px; position: relative; }
+        label { display: block; margin-bottom: 4px; font-weight: 500; color: #555; font-size: 0.85rem; }
+        input, select, textarea {
+            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px;
+            box-sizing: border-box; font-size: 1rem; outline: none; background: white;
+            -webkit-appearance: none; font-family: inherit;
+        }
+
+        .btn-primary {
+            width: 100%; padding: 16px; background: var(--primary-grad);
+            color: white; border: none; border-radius: 12px;
+            font-size: 1rem; font-weight: bold; cursor: pointer;
+            box-shadow: 0 4px 15px rgba(151, 51, 238, 0.3);
+        }
+
+        .card {
+            background: white; padding: 15px; border-radius: 16px;
+            margin-bottom: 12px; display: flex; gap: 15px; position: relative;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
+            cursor: pointer;
+        }
+        .card::before { content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 4px; border-radius: 0 4px 4px 0; }
+        .card.active::before { background: #9733ee; }
+        .card.sold::before { background: var(--success); }
+
+        .card-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; background: #eee; }
+        .card-info { flex: 1; }
+
+        #details-modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.8); display: none; justify-content: center;
+            align-items: center; z-index: 100; backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: white; width: 90%; max-width: 380px; border-radius: 24px;
+            padding: 20px; position: relative; max-height: 85vh; overflow-y: auto;
+        }
+        
+        .photo-gallery { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scroll-snap-type: x mandatory; }
+        .photo-gallery img { width: 100%; height: 250px; flex-shrink: 0; border-radius: 16px; object-fit: cover; scroll-snap-align: start; }
+
+        .photo-upload {
+            width: 100%; height: 80px; border: 2px dashed #ddd; border-radius: 12px;
+            display: flex; flex-direction: column; align-items: center; justify-content: center; 
+            font-size: 0.8rem; color: #aaa; cursor: pointer;
+        }
+        
+        .photo-preview-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+        .mini-preview { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+
+        .filter-row { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding: 5px 0; }
+        .filter-btn { padding: 8px 18px; border-radius: 20px; border: none; background: #eee; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
+        .filter-btn.active { background: var(--primary-grad); color: white; }
+
+        .stat-card { background: white; padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
+        .stat-val { font-weight: bold; font-size: 1.2rem; }
+        
+        .data-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
+        .btn-outline { background: white; border: 1px solid #ddd; padding: 12px; border-radius: 12px; font-size: 0.9rem; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
     </style>
 </head>
 <body>
 
 <div id="datalist-container"></div>
 
+<div id="details-modal" onclick="closeModal()">
+    <div class="modal-content" onclick="event.stopPropagation()">
+        <div id="m-gallery" class="photo-gallery"></div>
+        <h2 id="m-title" style="margin:0 0 15px 0; font-size:1.3rem;"></h2>
+        <div id="m-details"></div>
+        <button class="btn-primary" style="margin-top:15px;" onclick="closeModal()">Закрыть</button>
+        <button id="btn-delete-item" style="width:100%; background:none; border:none; color:var(--danger); margin-top:15px; font-weight:bold;">Удалить товар</button>
+    </div>
+</div>
+
 <div id="app-container">
-    <header>Resell Pro v10 Ultimate</header>
+    <header id="header-title">Новое устройство</header>
+
     <main>
         <div id="tab-add" class="tab-content active">
             <div class="form-group">
-                <label>Основное</label>
-                <select id="add-type" onchange="updateDatalists()">
+                <label>Категория</label>
+                <select id="add-type" onchange="updateDatalists(); renderAddForm();">
                     <option value="phone">📱 Смартфон</option>
                     <option value="headphones">🎧 Наушники</option>
                     <option value="watch">⌚ Часы</option>
                 </select>
-                <input id="b-brand" list="brands-dl" placeholder="Бренд" style="margin-top:8px;">
-                <input id="b-model" list="models-dl" placeholder="Модель" style="margin-top:8px;">
             </div>
 
             <div class="form-group">
-                <label>Фото (FYA89 Auto-Watermark)</label>
-                <input type="file" multiple onchange="handlePhotos(this)">
-                <div id="photo-preview-list" style="display:flex; gap:5px; margin-top:10px; overflow-x:auto;"></div>
-            </div>
-
-            <div class="form-group">
-                <label>Карта дефектов (тапай по корпусу)</label>
-                <div id="damage-map" onclick="addDamage(event)"></div>
-                <center><small id="damage-count">Точек: 0</small> | <button onclick="clearDamage()" style="font-size:0.6rem;">Сброс</button></center>
-            </div>
-
-            <div class="form-group">
-                <label>Комплект и Проверка</label>
-                <div class="checklist">
-                    <label><input type="checkbox" id="c-box"> Коробка</label>
-                    <label><input type="checkbox" id="c-check"> Чек/Док</label>
-                    <label><input type="checkbox" id="ch-face"> FaceID/Touch</label>
-                    <label><input type="checkbox" id="ch-truetone"> TrueTone</label>
+                <div class="photo-upload" onclick="document.getElementById('inp-photo').click()">
+                    <i class="fa-solid fa-camera"></i>
+                    <span>Добавить фото</span>
                 </div>
+                <input type="file" id="inp-photo" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
+                <div id="photo-preview-list" class="photo-preview-container"></div>
             </div>
 
-            <div class="form-group" style="background:#fff9c4;">
-                <label>Калькулятор выкупа</label>
-                <input type="number" id="calc-market" placeholder="Рынок ₽" oninput="runCalc()">
-                <div id="calc-res" style="font-weight:bold; font-size:0.8rem; color:#f57f17; margin-top:5px;">Предложить: -</div>
-            </div>
+            <div id="dynamic-form"></div>
 
-            <div style="display:flex; gap:10px;">
-                <div class="form-group" style="flex:1"><label>Закуп</label><input type="number" id="inp-buy"></div>
+            <div style="display:flex; gap:12px;">
+                <div class="form-group" style="flex:1"><label>Покупка</label><input type="number" id="inp-buy" placeholder="0"></div>
                 <div class="form-group" style="flex:1"><label>Ремонт</label><input type="number" id="inp-repair" value="0"></div>
             </div>
 
-            <button class="btn-primary" onclick="addItem()">Добавить на склад</button>
-        </div>
-
-        <div id="tab-base" class="tab-content">
-            <div id="base-list"></div>
+            <div class="form-group">
+                <label>Заметки (состояние, комплект)</label>
+                <textarea id="inp-comment" rows="2"></textarea>
+            </div>
+            <button class="btn-primary" onclick="addItem()">Добавить в базу</button>
         </div>
 
         <div id="tab-sell" class="tab-content">
+            <div class="form-group"><label>Поиск на складе</label><input type="text" id="sell-search" placeholder="Модель или IMEI..." oninput="renderSellList()"></div>
             <div class="form-group"><label>Товар</label><select id="sell-select"></select></div>
-            <div class="form-group"><label>Статус сделки</label>
-                <select id="sell-status">
-                    <option value="sold">💰 Продано</option>
-                    <option value="reserve">⏳ В резерв (Депозит)</option>
-                </select>
+            <div class="form-group"><label>Цена продажи</label><input type="number" id="sell-price" placeholder="₽"></div>
+            <button class="btn-primary" onclick="completeSell()">Продано</button>
+        </div>
+
+        <div id="tab-base" class="tab-content">
+            <div class="filter-row">
+                <button class="filter-btn active" onclick="renderBase('phone', this)">Смартфоны</button>
+                <button class="filter-btn" onclick="renderBase('headphones', this)">Наушники</button>
+                <button class="filter-btn" onclick="renderBase('watch', this)">Часы</button>
             </div>
-            <div class="form-group"><label>Цена / Депозит</label><input type="number" id="sell-price"></div>
-            <div class="form-group"><label>Трек-номер (СДЭК/Почта)</label><input type="text" id="logistics-track"></div>
-            <div class="form-group"><label>Клиент</label><input type="text" id="cust-info" placeholder="Имя / Контакт"></div>
-            <button class="btn-primary" onclick="processTransaction()">Выполнить</button>
+            <div id="base-list"></div>
         </div>
 
         <div id="tab-stats" class="tab-content">
-            <div class="form-group" style="text-align:center;">
-                <h3 id="stat-total-profit" style="margin:0; color:var(--success);">0 ₽</h3>
-                <small>Чистая прибыль</small>
+            <div style="background:white; border-radius:16px; padding:15px; height:180px; margin-bottom:15px;"><canvas id="statChart"></canvas></div>
+            <div class="stat-card"><span>Прибыль:</span><span id="stat-profit" class="stat-val">0 ₽</span></div>
+            <div class="stat-card"><span>ROI:</span><span id="stat-roi" class="stat-val">0%</span></div>
+            <div class="stat-card"><span>Сделок:</span><span id="stat-count" class="stat-val">0</span></div>
+            
+            <div class="data-actions">
+                <button class="btn-outline" onclick="downloadBackup()">
+                    <i class="fa-solid fa-file-export"></i> Экспорт базы (JSON)
+                </button>
+                <button class="btn-outline" onclick="document.getElementById('import-file').click()">
+                    <i class="fa-solid fa-file-import"></i> Импорт данных
+                </button>
+                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importBackup(this)">
             </div>
-            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
-                <div class="form-group"><small>В товаре</small><div id="stat-in-stock">0</div></div>
-                <div class="form-group"><small>В резерве</small><div id="stat-in-reserve">0</div></div>
-            </div>
-            <button class="btn-primary" style="background:#555;" onclick="downloadBackup()">Экспорт всей базы</button>
         </div>
+
+        <div id="tab-history" class="tab-content"><div id="history-list"></div></div>
     </main>
 
     <nav>
         <button class="active" onclick="showTab('add', this)"><i class="fa-solid fa-plus-circle"></i>Ввод</button>
-        <button onclick="showTab('base', this)"><i class="fa-solid fa-boxes-stacked"></i>Склад</button>
-        <button onclick="showTab('sell', this)"><i class="fa-solid fa-cart-shopping"></i>Сделка</button>
-        <button onclick="showTab('stats', this)"><i class="fa-solid fa-vault"></i>Сейф</button>
+        <button onclick="showTab('sell', this)"><i class="fa-solid fa-cash-register"></i>Продать</button>
+        <button onclick="showTab('base', this)"><i class="fa-solid fa-boxes-stacked"></i>База</button>
+        <button onclick="showTab('stats', this)"><i class="fa-solid fa-chart-line"></i>Стат.</button>
+        <button onclick="showTab('history', this)"><i class="fa-solid fa-list-ul"></i>Лог</button>
     </nav>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('resell_v10')) || [];
-    let tempPhotos = [];
-    let damagePoints = [];
-
     const GLOBAL_DATABASE = {
-        brands: ["Apple", "Samsung", "Xiaomi", "Google"],
+        brands: ["Apple", "Samsung", "Xiaomi", "Google", "Huawei", "Honor", "Sony", "Realme", "OnePlus", "Nothing"],
         models: {
-            phone: ["iPhone 16 Pro Max", "iPhone 15 Pro", "Galaxy S24 Ultra", "Pixel 9 Pro"],
-            headphones: ["AirPods Pro 2", "Sony WH-1000XM5"],
-            watch: ["Apple Watch Ultra 2", "Galaxy Watch 7"]
+            phone: [
+                "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16",
+                "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
+                "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14", "iPhone 13 Pro Max", 
+                "iPhone 13", "iPhone 13 mini", "iPhone 12 Pro", "iPhone 12", "iPhone 11",
+                "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24", "Galaxy S23 Ultra", "Galaxy S22 Ultra",
+                "Redmi Note 13 Pro", "Poco F6 Pro", "Poco X6 Pro", "Xiaomi 14 Ultra"
+            ],
+            headphones: [
+                "AirPods Pro 2", "AirPods 4 (ANC)", "AirPods 3", "AirPods Max", "Galaxy Buds 3 Pro", "Sony WH-1000XM5"
+            ],
+            watch: [
+                "Apple Watch Ultra 2", "Apple Watch Series 10", "Apple Watch Series 9", "Galaxy Watch 7", "Huawei Watch GT 4"
+            ]
         }
     };
 
+    let db = JSON.parse(localStorage.getItem('resell_db_v8')) || [];
+    let logs = JSON.parse(localStorage.getItem('resell_logs_v8')) || [];
+    let tempPhotos = [];
+    let chartObj = null;
+
     function updateDatalists() {
         const type = document.getElementById('add-type').value;
-        document.getElementById('datalist-container').innerHTML = `
-            <datalist id="brands-dl">${GLOBAL_DATABASE.brands.map(b=>`<option value="${b}">`).join('')}</datalist>
-            <datalist id="models-dl">${GLOBAL_DATABASE.models[type].map(m=>`<option value="${m}">`).join('')}</datalist>
-        `;
+        let html = `<datalist id="brands-dl">${GLOBAL_DATABASE.brands.map(b => `<option value="${b}">`).join('')}</datalist>`;
+        html += `<datalist id="models-dl">${GLOBAL_DATABASE.models[type].map(m => `<option value="${m}">`).join('')}</datalist>`;
+        document.getElementById('datalist-container').innerHTML = html;
     }
 
-    function addDamage(e) {
-        const rect = e.target.getBoundingClientRect();
-        const x = ((e.clientX - rect.left) / rect.width) * 100;
-        const y = ((e.clientY - rect.top) / rect.height) * 100;
-        damagePoints.push({x, y});
-        renderDamagePoints();
+    function renderAddForm() {
+        const type = document.getElementById('add-type').value;
+        const div = document.getElementById('dynamic-form');
+        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" list="brands-dl" placeholder="Apple"></div>
+                 <div class="form-group"><label>Модель</label><input id="b-model" list="models-dl" placeholder="iPhone 15"></div>
+                 <div class="form-group"><label>Цвет</label><input id="b-color" placeholder="Space Black"></div>`;
+        if(type === 'phone') h += `<div class="form-group"><label>Память (Гб)</label><input type="number" id="b-memory" placeholder="256"></div>`;
+        h += `<div class="form-group"><label>IMEI / S/N</label><input id="b-imei" placeholder="Номер"></div>`;
+        div.innerHTML = h;
     }
 
-    function renderDamagePoints() {
-        const map = document.getElementById('damage-map');
-        map.querySelectorAll('.damage-point').forEach(p => p.remove());
-        damagePoints.forEach(p => {
-            const div = document.createElement('div');
-            div.className = 'damage-point';
-            div.style.left = p.x + '%';
-            div.style.top = p.y + '%';
-            map.appendChild(div);
-        });
-        document.getElementById('damage-count').innerText = `Точек: ${damagePoints.length}`;
-    }
-
-    function clearDamage() { damagePoints = []; renderDamagePoints(); }
-
-    function runCalc() {
-        const market = document.getElementById('calc-market').value;
-        document.getElementById('calc-res').innerText = market ? `Предложить: ${market - 5000} ₽` : "-";
-    }
+    updateDatalists();
+    renderAddForm();
 
     async function handlePhotos(input) {
         tempPhotos = [];
-        for (let f of input.files) {
-            const data = await processImage(f);
+        const files = Array.from(input.files);
+        const preview = document.getElementById('photo-preview-list');
+        preview.innerHTML = "";
+        for (let file of files) {
+            const data = await readFile(file);
             tempPhotos.push(data);
+            preview.innerHTML += `<img src="${data}" class="mini-preview">`;
         }
-        document.getElementById('photo-preview-list').innerHTML = tempPhotos.map(p => `<img src="${p}" style="width:50px; height:50px; object-fit:cover; border-radius:5px;">`).join('');
     }
 
-    function processImage(file) {
+    function readFile(file) {
         return new Promise(res => {
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -209,12 +290,9 @@
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     const ctx = canvas.getContext('2d');
-                    canvas.width = 800; canvas.height = 800;
-                    ctx.drawImage(img, 0, 0, 800, 800);
-                    ctx.font = "bold 30px Arial";
-                    ctx.fillStyle = "rgba(255,255,255,0.4)";
-                    ctx.fillText("FYA89", 680, 770);
-                    res(canvas.toDataURL('image/jpeg', 0.7));
+                    canvas.width = 600; canvas.height = 600;
+                    ctx.drawImage(img, 0, 0, 600, 600);
+                    res(canvas.toDataURL('image/jpeg', 0.6));
                 };
             };
             reader.readAsDataURL(file);
@@ -224,16 +302,24 @@
     function addItem() {
         const item = {
             id: Date.now(),
-            status: 'stock',
-            dateIn: new Date().toISOString(),
+            type: document.getElementById('add-type').value,
             brand: document.getElementById('b-brand').value,
             model: document.getElementById('b-model').value,
+            color: document.getElementById('b-color').value,
+            imei: document.getElementById('b-imei').value,
+            memory: document.getElementById('b-memory')?.value || '',
             buy: parseFloat(document.getElementById('inp-buy').value || 0),
             rep: parseFloat(document.getElementById('inp-repair').value || 0),
+            comment: document.getElementById('inp-comment').value,
             photos: tempPhotos,
-            damages: [...damagePoints]
+            status: 'stock',
+            date: new Date().toISOString()
         };
-        db.push(item); save(); location.reload();
+        if(!item.brand || !item.buy) return alert("Бренд и цена обязательны!");
+        db.push(item);
+        logs.unshift({t: `+ ${item.brand} ${item.model}`, d: new Date().toLocaleString(), type:'in'});
+        save();
+        location.reload();
     }
 
     function showTab(name, btn) {
@@ -241,56 +327,139 @@
         document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
         document.getElementById('tab-' + name).classList.add('active');
         btn.classList.add('active');
-        if(name === 'base') renderBase();
-        if(name === 'sell') {
-            const active = db.filter(x => x.status !== 'sold');
-            document.getElementById('sell-select').innerHTML = active.map(a => `<option value="${a.id}">${a.model} (${a.buy+a.rep}₽)</option>`).join('');
-        }
+        if(name === 'sell') renderSellList();
+        if(name === 'base') renderBase('phone', document.querySelectorAll('.filter-btn')[0]);
         if(name === 'stats') updateStats();
+        if(name === 'history') renderHistory();
     }
 
-    function renderBase() {
-        const list = document.getElementById('base-list');
-        list.innerHTML = db.map(i => {
-            const days = Math.floor((new Date() - new Date(i.dateIn))/86400000);
-            return `
-                <div class="card ${i.status} ${days > 30 ? 'stale' : ''}">
-                    <img src="${i.photos[0] || ''}" style="width:50px; height:50px; object-fit:cover; border-radius:8px;">
-                    <div>
-                        <b>${i.model}</b><br><small>${days} дн. на складе</small>
-                    </div>
-                    <span class="badge" style="background:gray;">${i.status.toUpperCase()}</span>
+    function renderBase(type, btn) {
+        if(btn) {
+            document.querySelectorAll('#tab-base .filter-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        }
+        const filtered = db.filter(i => i.type === type);
+        document.getElementById('base-list').innerHTML = filtered.length ? filtered.map(i => `
+            <div class="card ${i.status === 'stock' ? 'active' : 'sold'}" onclick="openModal(${i.id})">
+                <img src="${i.photos[0] || 'https://via.placeholder.com/70'}" class="card-img">
+                <div class="card-info">
+                    <h3 style="margin:0; font-size:1rem;">${i.brand} ${i.model}</h3>
+                    <p style="margin:2px 0; font-size:0.8rem; color:#888;">${i.color} ${i.memory ? '| '+i.memory+'Gb' : ''}</p>
+                    <p style="margin:0; font-weight:bold; color:${i.status === 'sold' ? 'var(--success)' : 'var(--gold)'}">
+                        ${i.status === 'sold' ? (i.sellPrice-(i.buy+i.rep))+' ₽' : (i.buy+i.rep)+' ₽'}
+                    </p>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `).join('') : '<p style="text-align:center; color:#999; margin-top:50px;">Пусто</p>';
     }
 
-    function processTransaction() {
+    function openModal(id) {
+        const item = db.find(i => i.id == id);
+        if(!item) return;
+        const gallery = document.getElementById('m-gallery');
+        gallery.innerHTML = item.photos.length ? item.photos.map(p => `<img src="${p}">`).join('') : '<img src="https://via.placeholder.com/300?text=Без+фото">';
+        document.getElementById('m-title').innerText = `${item.brand} ${item.model}`;
+        document.getElementById('m-details').innerHTML = `
+            <div class="modal-row"><span class="modal-label">IMEI/SN</span><span class="modal-val">${item.imei || '-'}</span></div>
+            <div class="modal-row"><span class="modal-label">Затраты</span><span class="modal-val">${item.buy + item.rep} ₽</span></div>
+            ${item.status === 'sold' ? `<div class="modal-row"><span class="modal-label">Продажа</span><span class="modal-val" style="color:var(--success)">${item.sellPrice} ₽</span></div>` : ''}
+            <div style="margin-top:10px;"><small style="color:#888">Заметки:</small><p style="margin:4px 0; font-size:0.9rem;">${item.comment || '-'}</p></div>
+        `;
+        document.getElementById('btn-delete-item').onclick = () => deleteItem(item.id);
+        document.getElementById('details-modal').style.display = 'flex';
+    }
+
+    function deleteItem(id) {
+        if(confirm("Удалить?")) {
+            db = db.filter(i => i.id !== id);
+            save(); closeModal(); location.reload();
+        }
+    }
+
+    function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
+
+    function renderSellList() {
+        const s = document.getElementById('sell-search').value.toLowerCase();
+        const active = db.filter(i => i.status === 'stock' && (i.brand + i.model + i.imei).toLowerCase().includes(s));
+        document.getElementById('sell-select').innerHTML = active.map(i => `<option value="${i.id}">${i.brand} ${i.model} (${i.buy+i.rep}₽)</option>`).join('');
+    }
+
+    function completeSell() {
         const id = document.getElementById('sell-select').value;
-        const idx = db.findIndex(x => x.id == id);
-        db[idx].status = document.getElementById('sell-status').value;
-        db[idx].sellPrice = parseFloat(document.getElementById('sell-price').value);
-        db[idx].track = document.getElementById('logistics-track').value;
-        db[idx].customer = document.getElementById('cust-info').value;
+        const price = parseFloat(document.getElementById('sell-price').value);
+        if(!id || !price) return alert("Данные!");
+        const idx = db.findIndex(i => i.id == id);
+        db[idx].status = 'sold';
+        db[idx].sellPrice = price;
+        db[idx].sellDate = new Date().toISOString();
+        logs.unshift({t: `Продано: ${db[idx].model}`, d: new Date().toLocaleString(), type:'out'});
         save(); location.reload();
     }
 
     function updateStats() {
-        const stockVal = db.filter(x => x.status === 'stock').reduce((a, b) => a + (b.buy+b.rep), 0);
-        const reserveVal = db.filter(x => x.status === 'reserve').reduce((a, b) => a + b.sellPrice, 0);
-        const profit = db.filter(x => x.status === 'sold').reduce((a, b) => a + (b.sellPrice - (b.buy+b.rep)), 0);
-        
-        document.getElementById('stat-in-stock').innerText = stockVal + " ₽";
-        document.getElementById('stat-in-reserve').innerText = reserveVal + " ₽";
-        document.getElementById('stat-total-profit').innerText = profit + " ₽";
+        const sold = db.filter(i => i.status === 'sold');
+        let prof = 0, cost = 0;
+        sold.forEach(i => { prof += (i.sellPrice - (i.buy+i.rep)); cost += (i.buy+i.rep); });
+        document.getElementById('stat-profit').innerText = prof + " ₽";
+        document.getElementById('stat-profit').style.color = prof >= 0 ? "var(--success)" : "var(--danger)";
+        document.getElementById('stat-roi').innerText = cost > 0 ? ((prof/cost)*100).toFixed(1) + "%" : "0%";
+        document.getElementById('stat-count').innerText = sold.length;
+        renderChart(sold);
     }
 
-    function save() { localStorage.setItem('resell_v10', JSON.stringify(db)); }
-    function downloadBackup() {
-        const blob = new Blob([JSON.stringify(db)], {type:'application/json'});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download='resell_v10.json'; a.click();
+    function renderChart(data) {
+        const ctx = document.getElementById('statChart').getContext('2d');
+        if(chartObj) chartObj.destroy();
+        chartObj = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: data.map(i => new Date(i.sellDate).toLocaleDateString()),
+                datasets: [{ label: 'Profit', data: data.map(i => i.sellPrice - (i.buy+i.rep)), borderColor: '#9733ee', tension: 0.4 }]
+            },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        });
     }
-    updateDatalists();
+
+    function renderHistory() {
+        document.getElementById('history-list').innerHTML = logs.map(l => `
+            <div class="stat-card" style="border-left: 4px solid ${l.type==='in'?'#9733ee':'#2ecc71'}">
+                <div style="font-size:0.85rem;"><b>${l.t}</b><br><small>${l.d}</small></div>
+            </div>
+        `).join('');
+    }
+
+    function save() {
+        localStorage.setItem('resell_db_v8', JSON.stringify(db));
+        localStorage.setItem('resell_logs_v8', JSON.stringify(logs));
+    }
+
+    function downloadBackup() {
+        const blob = new Blob([JSON.stringify({db, logs})], {type: "application/json"});
+        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'resell_backup.json'; a.click();
+    }
+
+    function importBackup(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.db && data.logs) {
+                    db = data.db; 
+                    logs = data.logs; 
+                    save(); 
+                    alert("Данные успешно импортированы!"); 
+                    location.reload();
+                } else {
+                    alert("Ошибка: Неверный формат файла.");
+                }
+            } catch (err) {
+                alert("Ошибка при чтении файла.");
+            }
+        };
+        reader.readAsText(file);
+    }
 </script>
 </body>
 </html>
