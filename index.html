@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resell Pro Aurora Edition</title>
+    <title>Resell App</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -66,7 +66,7 @@
         nav button {
             background: none; border: none; color: #636366;
             font-size: 0.7rem; display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; transition: 0.3s;
+            cursor: pointer;
         }
         nav button.active { color: #43e97b; }
         nav button i { font-size: 1.5rem; margin-bottom: 5px; }
@@ -100,7 +100,6 @@
 
         .card-img { width: 75px; height: 75px; border-radius: 14px; object-fit: cover; background: #2c2c2e; }
 
-        /* Гарантия */
         .warranty-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; margin-top: 6px; text-transform: uppercase; }
         .warranty-ok { color: var(--success); border: 1px solid var(--success); }
         .warranty-warning { color: var(--gold); border: 1px solid var(--gold); }
@@ -112,7 +111,6 @@
             align-items: center; z-index: 100; backdrop-filter: blur(10px);
         }
         .modal-content { background: #1c1c1e; width: 90%; border-radius: 28px; padding: 24px; border: 0.5px solid rgba(255,255,255,0.1); }
-        
         .photo-gallery { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
         .photo-gallery img { width: 100%; height: 250px; flex-shrink: 0; border-radius: 16px; object-fit: cover; }
         
@@ -168,7 +166,7 @@
         </div>
 
         <div id="tab-sell" class="tab-content">
-            <div class="form-group"><label>Поиск на складе</label><input type="text" id="sell-search" placeholder="Модель или IMEI..." oninput="renderSellList()"></div>
+            <div class="form-group"><label>Поиск по складу</label><input type="text" id="sell-search" placeholder="Модель или IMEI..." oninput="renderSellList()"></div>
             <div class="form-group"><label>Товар</label><select id="sell-select"></select></div>
             <div class="form-group"><label>Цена продажи</label><input type="number" id="sell-price" placeholder="₽"></div>
             <button class="btn-primary" onclick="completeSell()">Продано</button>
@@ -187,7 +185,16 @@
             <div style="background:#1c1c1e; border-radius:18px; padding:15px; height:180px; margin-bottom:15px;"><canvas id="statChart"></canvas></div>
             <div class="stat-card"><span>Прибыль</span><span id="stat-profit" class="stat-val">0 ₽</span></div>
             <div class="stat-card"><span>ROI</span><span id="stat-roi" class="stat-val">0%</span></div>
-            <button class="btn-primary" onclick="downloadBackup()" style="background:#2c2c2e; color:white; margin-top:10px;">Экспорт (JSON)</button>
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px;">
+                <button class="btn-primary" onclick="downloadBackup()" style="background:#2c2c2e; color:white; font-size: 0.8rem;">
+                    <i class="fa-solid fa-file-export"></i> Экспорт
+                </button>
+                <button class="btn-primary" onclick="document.getElementById('import-file').click()" style="background:#2c2c2e; color:white; font-size: 0.8rem;">
+                    <i class="fa-solid fa-file-import"></i> Импорт
+                </button>
+            </div>
+            <input type="file" id="import-file" style="display:none" accept=".json" onchange="importBackup(this)">
         </div>
 
         <div id="tab-history" class="tab-content"><div id="history-list"></div></div>
@@ -204,7 +211,7 @@
 
 <script>
     const GLOBAL_DATABASE = {
-        brands: ["Apple", "Samsung", "Xiaomi", "Google", "Sony", "Realme", "OnePlus", "Nothing"],
+        brands: ["Apple", "Samsung", "Xiaomi", "Google", "Sony", "Realme", "Nothing"],
         models: {
             phone: ["iPhone 16 Pro Max", "iPhone 15 Pro", "Galaxy S24 Ultra", "Pixel 9 Pro"],
             headphones: ["AirPods Pro 2", "AirPods 4", "Sony WH-1000XM5"],
@@ -282,7 +289,7 @@
         };
         if(!item.brand || !item.buy) return alert("Заполни бренд и цену!");
         db.push(item);
-        logs.unshift({t: `Приход: ${item.model}`, d: new Date().toLocaleString(), type:'in'});
+        logs.unshift({t: `+ ${item.brand} ${item.model}`, d: new Date().toLocaleString(), type:'in'});
         save(); location.reload();
     }
 
@@ -306,18 +313,11 @@
         document.getElementById('base-list').innerHTML = filtered.map(i => {
             let warrantyHtml = '';
             if (i.status === 'sold' && i.sellDate) {
-                const soldDate = new Date(i.sellDate);
-                const diffTime = Math.floor((new Date() - soldDate) / (1000 * 60 * 60 * 24));
-                const daysLeft = 14 - diffTime;
-                
-                if (daysLeft > 0) {
-                    const wClass = daysLeft <= 3 ? 'warranty-warning' : 'warranty-ok';
-                    warrantyHtml = `<div class="warranty-tag ${wClass}">Гарантия: ${daysLeft} дн.</div>`;
-                } else {
-                    warrantyHtml = `<div class="warranty-tag warranty-expired">Гарантия вышла</div>`;
-                }
+                const diffTime = Math.floor((new Date() - new Date(i.sellDate)) / 86400000);
+                const left = 14 - diffTime;
+                const wClass = left <= 0 ? 'warranty-expired' : (left <= 3 ? 'warranty-warning' : 'warranty-ok');
+                warrantyHtml = `<div class="warranty-tag ${wClass}">${left <= 0 ? 'Гарантия вышла' : 'Гарантия: '+left+' дн.'}</div>`;
             }
-
             return `
                 <div class="card ${i.status === 'stock' ? 'active' : 'sold'}" onclick="openModal(${i.id})">
                     <img src="${i.photos[0] || ''}" class="card-img">
@@ -338,12 +338,7 @@
         const item = db.find(i => i.id == id);
         document.getElementById('m-gallery').innerHTML = item.photos.length ? item.photos.map(p => `<img src="${p}">`).join('') : '<img src="https://via.placeholder.com/300?text=Нет+фото">';
         document.getElementById('m-title').innerText = item.model;
-        document.getElementById('m-details').innerHTML = `
-            IMEI: ${item.imei || '-'}<br>
-            Затраты: ${item.buy+item.rep}₽<br>
-            ${item.status === 'sold' ? 'Продано за: '+item.sellPrice+'₽' : 'На складе'}<br>
-            Заметки: ${item.comment || '-'}
-        `;
+        document.getElementById('m-details').innerHTML = `IMEI: ${item.imei || '-'}<br>Затраты: ${item.buy+item.rep}₽<br>Заметки: ${item.comment || '-'}`;
         document.getElementById('btn-delete-item').onclick = () => { if(confirm('Удалить?')){db=db.filter(x=>x.id!=id); save(); location.reload();} };
         document.getElementById('details-modal').style.display = 'flex';
     }
@@ -359,7 +354,7 @@
     function completeSell() {
         const id = document.getElementById('sell-select').value;
         const price = parseFloat(document.getElementById('sell-price').value);
-        if(!id || !price) return alert("Выбери товар и цену!");
+        if(!id || !price) return alert("Ошибка данных");
         const idx = db.findIndex(i => i.id == id);
         db[idx].status = 'sold';
         db[idx].sellPrice = price;
@@ -381,7 +376,7 @@
             type: 'line',
             data: {
                 labels: sold.map(i => new Date(i.sellDate).toLocaleDateString()),
-                datasets: [{ label: 'Прибыль', data: sold.map(i => i.sellPrice - (i.buy+i.rep)), borderColor: '#43e97b', tension: 0.4 }]
+                datasets: [{ label: 'Profit', data: sold.map(i => i.sellPrice - (i.buy+i.rep)), borderColor: '#43e97b', tension: 0.4 }]
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
@@ -396,34 +391,42 @@
     }
 
     function save() { localStorage.setItem('resell_db_v8', JSON.stringify(db)); localStorage.setItem('resell_logs_v8', JSON.stringify(logs)); }
+    
     function downloadBackup() {
         const a = document.createElement('a');
         a.href = URL.createObjectURL(new Blob([JSON.stringify({db, logs})], {type: "application/json"}));
-        a.download = 'resell_aurora_db.json'; a.click();
+        a.download = 'resell_backup.json'; a.click();
     }
 
-    // --- БЛОК ГАРАНТИИ И УВЕДОМЛЕНИЙ ---
-    if (Notification.permission !== 'granted') Notification.requestPermission();
+    function importBackup(input) {
+        const file = input.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const data = JSON.parse(e.target.result);
+                if (data.db && data.logs) {
+                    db = data.db; logs = data.logs; save(); location.reload();
+                }
+            } catch (err) { alert("Ошибка файла"); }
+        };
+        reader.readAsText(file);
+    }
 
-    function checkWarrantyNotifications() {
+    if (Notification.permission !== 'granted') Notification.requestPermission();
+    function checkNotifications() {
         db.filter(i => i.status === 'sold').forEach(item => {
             const left = 14 - Math.floor((new Date() - new Date(item.sellDate)) / 86400000);
             const key = `notif_${item.id}_${left}`;
-            
-            // Проверка по заданным дням
             if ([7, 3, 1, 0].includes(left) && !localStorage.getItem(key)) {
                 if (Notification.permission === 'granted') {
-                    let msg = left === 0 ? `Гарантия на ${item.model} закончилась` : `Осталось ${left} дн. гарантии на ${item.model}`;
-                    new Notification("Resell Pro: Гарантия", { body: msg });
+                    new Notification("Гарантия", { body: left === 0 ? `Гарантия на ${item.model} вышла` : `Осталось ${left} дн. гарантии на ${item.model}` });
                     localStorage.setItem(key, "true");
                 }
             }
         });
     }
-
-    setInterval(checkWarrantyNotifications, 3600000); // Проверка каждый час
-    checkWarrantyNotifications(); // И при загрузке
-    
+    setInterval(checkNotifications, 3600000); checkNotifications();
     updateDatalists(); renderAddForm();
 </script>
 </body>
