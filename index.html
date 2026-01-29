@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Resell Pro Database Edition</title>
+    <title>Resell Pro Aurora Edition</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -14,19 +14,23 @@
     
     <style>
         :root {
-            --primary-grad: linear-gradient(135deg, #da22ff 0%, #9733ee 100%);
-            --bg-color: #f4f7f6;
-            --danger: #ff4b5c;
-            --success: #2ecc71;
-            --gold: #d4af37;
+            --primary-grad: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            --bg-color: #000000; 
+            --card-bg: #1c1c1e;  
+            --danger: #ff453a;
+            --success: #32d74b;
+            --gold: #ffd60a;
+            --text-main: #ffffff;
+            --text-dim: #8e8e93;
         }
 
         body {
             margin: 0; padding: 0;
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: #222;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Segoe UI", Roboto, sans-serif;
+            background-color: var(--bg-color);
             display: flex; justify-content: center;
             height: 100vh; overflow: hidden;
+            color: var(--text-main);
         }
 
         #app-container {
@@ -37,93 +41,87 @@
         }
 
         header {
-            background: var(--primary-grad); color: white;
-            padding: 25px 20px 15px; text-align: center;
-            font-size: 1.2rem; font-weight: bold; z-index: 10;
+            background: var(--primary-grad); color: #000;
+            padding: 30px 20px 20px; text-align: center;
+            font-size: 1.1rem; font-weight: 800; z-index: 10;
+            letter-spacing: -0.5px;
         }
 
-        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 100px; }
+        main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 110px; -webkit-overflow-scrolling: touch; }
 
         .tab-content { display: none; }
-        .tab-content.active { display: block; animation: fadeIn 0.3s ease; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         nav {
-            position: absolute; bottom: 0; width: 100%; height: 85px;
-            background: rgba(255,255,255,0.95); backdrop-filter: blur(10px);
+            position: absolute; bottom: 0; width: 100%; height: 90px;
+            background: rgba(28, 28, 30, 0.8); backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             display: flex; justify-content: space-around;
-            align-items: center; border-top: 1px solid #eee; z-index: 20;
-            padding-bottom: 15px;
+            align-items: center; border-top: 0.5px solid rgba(255,255,255,0.1); z-index: 20;
+            padding-bottom: 20px;
         }
 
         nav button {
-            background: none; border: none; color: #aaa;
+            background: none; border: none; color: #636366;
             font-size: 0.7rem; display: flex; flex-direction: column; align-items: center;
-            cursor: pointer;
+            cursor: pointer; transition: 0.3s;
         }
-        nav button.active { color: #9733ee; }
-        nav button i { font-size: 1.4rem; margin-bottom: 4px; }
+        nav button.active { color: #43e97b; }
+        nav button i { font-size: 1.5rem; margin-bottom: 5px; }
 
-        .form-group { margin-bottom: 12px; position: relative; }
-        label { display: block; margin-bottom: 4px; font-weight: 500; color: #555; font-size: 0.85rem; }
+        .form-group { margin-bottom: 16px; }
+        label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-dim); font-size: 0.8rem; }
+        
         input, select, textarea {
-            width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 12px;
-            box-sizing: border-box; font-size: 1rem; outline: none; background: white;
-            -webkit-appearance: none; font-family: inherit;
+            width: 100%; padding: 14px; border: 0.5px solid rgba(255,255,255,0.1); 
+            border-radius: 16px; box-sizing: border-box; font-size: 1rem; outline: none; 
+            background: var(--card-bg); color: white; font-family: inherit;
         }
+
+        input[type="number"], .stat-val { font-variant-numeric: tabular-nums; }
 
         .btn-primary {
-            width: 100%; padding: 16px; background: var(--primary-grad);
-            color: white; border: none; border-radius: 12px;
-            font-size: 1rem; font-weight: bold; cursor: pointer;
-            box-shadow: 0 4px 15px rgba(151, 51, 238, 0.3);
+            width: 100%; padding: 18px; background: var(--primary-grad);
+            color: #000; border: none; border-radius: 16px;
+            font-size: 1rem; font-weight: 800; cursor: pointer;
+            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.2);
         }
 
         .card {
-            background: white; padding: 15px; border-radius: 16px;
+            background: var(--card-bg); padding: 16px; border-radius: 20px;
             margin-bottom: 12px; display: flex; gap: 15px; position: relative;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.03);
-            cursor: pointer;
+            border: 0.5px solid rgba(255,255,255,0.08);
         }
-        .card::before { content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 4px; border-radius: 0 4px 4px 0; }
-        .card.active::before { background: #9733ee; }
+        .card::before { content: ''; position: absolute; left: 0; top: 20px; bottom: 20px; width: 4px; border-radius: 0 4px 4px 0; }
+        .card.active::before { background: #43e97b; box-shadow: 2px 0 10px #43e97b; }
         .card.sold::before { background: var(--success); }
 
-        .card-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; background: #eee; }
-        .card-info { flex: 1; }
+        .card-img { width: 75px; height: 75px; border-radius: 14px; object-fit: cover; background: #2c2c2e; }
+
+        /* Гарантия */
+        .warranty-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; margin-top: 6px; text-transform: uppercase; }
+        .warranty-ok { color: var(--success); border: 1px solid var(--success); }
+        .warranty-warning { color: var(--gold); border: 1px solid var(--gold); }
+        .warranty-expired { color: var(--danger); border: 1px solid var(--danger); }
 
         #details-modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8); display: none; justify-content: center;
-            align-items: center; z-index: 100; backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.9); display: none; justify-content: center;
+            align-items: center; z-index: 100; backdrop-filter: blur(10px);
         }
-        .modal-content {
-            background: white; width: 90%; max-width: 380px; border-radius: 24px;
-            padding: 20px; position: relative; max-height: 85vh; overflow-y: auto;
-        }
+        .modal-content { background: #1c1c1e; width: 90%; border-radius: 28px; padding: 24px; border: 0.5px solid rgba(255,255,255,0.1); }
         
-        .photo-gallery { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; scroll-snap-type: x mandatory; }
-        .photo-gallery img { width: 100%; height: 250px; flex-shrink: 0; border-radius: 16px; object-fit: cover; scroll-snap-align: start; }
-
-        .photo-upload {
-            width: 100%; height: 80px; border: 2px dashed #ddd; border-radius: 12px;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; 
-            font-size: 0.8rem; color: #aaa; cursor: pointer;
-        }
+        .photo-gallery { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 10px; margin-bottom: 15px; }
+        .photo-gallery img { width: 100%; height: 250px; flex-shrink: 0; border-radius: 16px; object-fit: cover; }
         
-        .photo-preview-container { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
-        .mini-preview { width: 50px; height: 50px; border-radius: 8px; object-fit: cover; }
+        .filter-row { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding: 5px 0; }
+        .filter-btn { padding: 10px 20px; border-radius: 12px; border: none; background: #2c2c2e; color: var(--text-dim); font-weight: 600; cursor: pointer; white-space: nowrap; }
+        .filter-btn.active { background: var(--primary-grad); color: #000; }
 
-        .filter-row { display: flex; gap: 8px; margin-bottom: 15px; overflow-x: auto; padding: 5px 0; }
-        .filter-btn { padding: 8px 18px; border-radius: 20px; border: none; background: #eee; font-size: 0.85rem; cursor: pointer; white-space: nowrap; }
-        .filter-btn.active { background: var(--primary-grad); color: white; }
-
-        .stat-card { background: white; padding: 15px; border-radius: 16px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; }
-        .stat-val { font-weight: bold; font-size: 1.2rem; }
-        
-        .data-actions { margin-top: 20px; display: flex; flex-direction: column; gap: 10px; }
-        .btn-outline { background: white; border: 1px solid #ddd; padding: 12px; border-radius: 12px; font-size: 0.9rem; color: #555; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .stat-card { background: var(--card-bg); padding: 18px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+        .stat-val { font-weight: 800; font-size: 1.3rem; }
     </style>
 </head>
 <body>
@@ -133,15 +131,15 @@
 <div id="details-modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div id="m-gallery" class="photo-gallery"></div>
-        <h2 id="m-title" style="margin:0 0 15px 0; font-size:1.3rem;"></h2>
-        <div id="m-details"></div>
-        <button class="btn-primary" style="margin-top:15px;" onclick="closeModal()">Закрыть</button>
-        <button id="btn-delete-item" style="width:100%; background:none; border:none; color:var(--danger); margin-top:15px; font-weight:bold;">Удалить товар</button>
+        <h2 id="m-title" style="margin:0 0 15px 0; font-size:1.3rem; color:white;"></h2>
+        <div id="m-details" style="color: #8e8e93; font-size: 0.9rem;"></div>
+        <button class="btn-primary" style="margin-top:20px;" onclick="closeModal()">Закрыть</button>
+        <button id="btn-delete-item" style="width:100%; background:none; border:none; color:var(--danger); margin-top:20px; font-weight:bold;">Удалить из базы</button>
     </div>
 </div>
 
 <div id="app-container">
-    <header id="header-title">Новое устройство</header>
+    <header id="header-title">Resell Pro Aurora</header>
 
     <main>
         <div id="tab-add" class="tab-content active">
@@ -153,27 +151,19 @@
                     <option value="watch">⌚ Часы</option>
                 </select>
             </div>
-
-            <div class="form-group">
-                <div class="photo-upload" onclick="document.getElementById('inp-photo').click()">
-                    <i class="fa-solid fa-camera"></i>
-                    <span>Добавить фото</span>
-                </div>
+            <div class="form-group" style="text-align:center;">
+                <button class="btn-primary" style="background:#2c2c2e; color:white; font-size:0.8rem; padding:12px;" onclick="document.getElementById('inp-photo').click()">
+                    <i class="fa-solid fa-camera"></i> Добавить фото
+                </button>
                 <input type="file" id="inp-photo" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
-                <div id="photo-preview-list" class="photo-preview-container"></div>
+                <div id="photo-preview-list" style="display:flex; gap:8px; margin-top:10px; flex-wrap:wrap;"></div>
             </div>
-
             <div id="dynamic-form"></div>
-
             <div style="display:flex; gap:12px;">
-                <div class="form-group" style="flex:1"><label>Покупка</label><input type="number" id="inp-buy" placeholder="0"></div>
+                <div class="form-group" style="flex:1"><label>Покупка</label><input type="number" id="inp-buy" placeholder="₽"></div>
                 <div class="form-group" style="flex:1"><label>Ремонт</label><input type="number" id="inp-repair" value="0"></div>
             </div>
-
-            <div class="form-group">
-                <label>Заметки (состояние, комплект)</label>
-                <textarea id="inp-comment" rows="2"></textarea>
-            </div>
+            <div class="form-group"><label>Заметки</label><textarea id="inp-comment" rows="2"></textarea></div>
             <button class="btn-primary" onclick="addItem()">Добавить в базу</button>
         </div>
 
@@ -194,20 +184,10 @@
         </div>
 
         <div id="tab-stats" class="tab-content">
-            <div style="background:white; border-radius:16px; padding:15px; height:180px; margin-bottom:15px;"><canvas id="statChart"></canvas></div>
-            <div class="stat-card"><span>Прибыль:</span><span id="stat-profit" class="stat-val">0 ₽</span></div>
-            <div class="stat-card"><span>ROI:</span><span id="stat-roi" class="stat-val">0%</span></div>
-            <div class="stat-card"><span>Сделок:</span><span id="stat-count" class="stat-val">0</span></div>
-            
-            <div class="data-actions">
-                <button class="btn-outline" onclick="downloadBackup()">
-                    <i class="fa-solid fa-file-export"></i> Экспорт базы (JSON)
-                </button>
-                <button class="btn-outline" onclick="document.getElementById('import-file').click()">
-                    <i class="fa-solid fa-file-import"></i> Импорт данных
-                </button>
-                <input type="file" id="import-file" style="display:none" accept=".json" onchange="importBackup(this)">
-            </div>
+            <div style="background:#1c1c1e; border-radius:18px; padding:15px; height:180px; margin-bottom:15px;"><canvas id="statChart"></canvas></div>
+            <div class="stat-card"><span>Прибыль</span><span id="stat-profit" class="stat-val">0 ₽</span></div>
+            <div class="stat-card"><span>ROI</span><span id="stat-roi" class="stat-val">0%</span></div>
+            <button class="btn-primary" onclick="downloadBackup()" style="background:#2c2c2e; color:white; margin-top:10px;">Экспорт (JSON)</button>
         </div>
 
         <div id="tab-history" class="tab-content"><div id="history-list"></div></div>
@@ -217,29 +197,18 @@
         <button class="active" onclick="showTab('add', this)"><i class="fa-solid fa-plus-circle"></i>Ввод</button>
         <button onclick="showTab('sell', this)"><i class="fa-solid fa-cash-register"></i>Продать</button>
         <button onclick="showTab('base', this)"><i class="fa-solid fa-boxes-stacked"></i>База</button>
-        <button onclick="showTab('stats', this)"><i class="fa-solid fa-chart-line"></i>Стат.</button>
+        <button onclick="showTab('stats', this)"><i class="fa-solid fa-chart-line"></i>Сейф</button>
         <button onclick="showTab('history', this)"><i class="fa-solid fa-list-ul"></i>Лог</button>
     </nav>
 </div>
 
 <script>
     const GLOBAL_DATABASE = {
-        brands: ["Apple", "Samsung", "Xiaomi", "Google", "Huawei", "Honor", "Sony", "Realme", "OnePlus", "Nothing"],
+        brands: ["Apple", "Samsung", "Xiaomi", "Google", "Sony", "Realme", "OnePlus", "Nothing"],
         models: {
-            phone: [
-                "iPhone 16 Pro Max", "iPhone 16 Pro", "iPhone 16 Plus", "iPhone 16",
-                "iPhone 15 Pro Max", "iPhone 15 Pro", "iPhone 15 Plus", "iPhone 15",
-                "iPhone 14 Pro Max", "iPhone 14 Pro", "iPhone 14", "iPhone 13 Pro Max", 
-                "iPhone 13", "iPhone 13 mini", "iPhone 12 Pro", "iPhone 12", "iPhone 11",
-                "Galaxy S24 Ultra", "Galaxy S24+", "Galaxy S24", "Galaxy S23 Ultra", "Galaxy S22 Ultra",
-                "Redmi Note 13 Pro", "Poco F6 Pro", "Poco X6 Pro", "Xiaomi 14 Ultra"
-            ],
-            headphones: [
-                "AirPods Pro 2", "AirPods 4 (ANC)", "AirPods 3", "AirPods Max", "Galaxy Buds 3 Pro", "Sony WH-1000XM5"
-            ],
-            watch: [
-                "Apple Watch Ultra 2", "Apple Watch Series 10", "Apple Watch Series 9", "Galaxy Watch 7", "Huawei Watch GT 4"
-            ]
+            phone: ["iPhone 16 Pro Max", "iPhone 15 Pro", "Galaxy S24 Ultra", "Pixel 9 Pro"],
+            headphones: ["AirPods Pro 2", "AirPods 4", "Sony WH-1000XM5"],
+            watch: ["Apple Watch Ultra 2", "Galaxy Watch 7"]
         }
     };
 
@@ -258,26 +227,22 @@
     function renderAddForm() {
         const type = document.getElementById('add-type').value;
         const div = document.getElementById('dynamic-form');
-        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" list="brands-dl" placeholder="Apple"></div>
-                 <div class="form-group"><label>Модель</label><input id="b-model" list="models-dl" placeholder="iPhone 15"></div>
-                 <div class="form-group"><label>Цвет</label><input id="b-color" placeholder="Space Black"></div>`;
-        if(type === 'phone') h += `<div class="form-group"><label>Память (Гб)</label><input type="number" id="b-memory" placeholder="256"></div>`;
-        h += `<div class="form-group"><label>IMEI / S/N</label><input id="b-imei" placeholder="Номер"></div>`;
+        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" list="brands-dl"></div>
+                 <div class="form-group"><label>Модель</label><input id="b-model" list="models-dl"></div>
+                 <div class="form-group"><label>Цвет</label><input id="b-color"></div>`;
+        if(type === 'phone') h += `<div class="form-group"><label>Память (Гб)</label><input type="number" id="b-memory"></div>`;
+        h += `<div class="form-group"><label>IMEI / SN</label><input id="b-imei"></div>`;
         div.innerHTML = h;
     }
 
-    updateDatalists();
-    renderAddForm();
-
     async function handlePhotos(input) {
         tempPhotos = [];
-        const files = Array.from(input.files);
         const preview = document.getElementById('photo-preview-list');
         preview.innerHTML = "";
-        for (let file of files) {
+        for (let file of input.files) {
             const data = await readFile(file);
             tempPhotos.push(data);
-            preview.innerHTML += `<img src="${data}" class="mini-preview">`;
+            preview.innerHTML += `<img src="${data}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">`;
         }
     }
 
@@ -315,11 +280,10 @@
             status: 'stock',
             date: new Date().toISOString()
         };
-        if(!item.brand || !item.buy) return alert("Бренд и цена обязательны!");
+        if(!item.brand || !item.buy) return alert("Заполни бренд и цену!");
         db.push(item);
-        logs.unshift({t: `+ ${item.brand} ${item.model}`, d: new Date().toLocaleString(), type:'in'});
-        save();
-        location.reload();
+        logs.unshift({t: `Приход: ${item.model}`, d: new Date().toLocaleString(), type:'in'});
+        save(); location.reload();
     }
 
     function showTab(name, btn) {
@@ -327,8 +291,8 @@
         document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
         document.getElementById('tab-' + name).classList.add('active');
         btn.classList.add('active');
-        if(name === 'sell') renderSellList();
         if(name === 'base') renderBase('phone', document.querySelectorAll('.filter-btn')[0]);
+        if(name === 'sell') renderSellList();
         if(name === 'stats') updateStats();
         if(name === 'history') renderHistory();
     }
@@ -339,55 +303,63 @@
             btn.classList.add('active');
         }
         const filtered = db.filter(i => i.type === type);
-        document.getElementById('base-list').innerHTML = filtered.length ? filtered.map(i => `
-            <div class="card ${i.status === 'stock' ? 'active' : 'sold'}" onclick="openModal(${i.id})">
-                <img src="${i.photos[0] || 'https://via.placeholder.com/70'}" class="card-img">
-                <div class="card-info">
-                    <h3 style="margin:0; font-size:1rem;">${i.brand} ${i.model}</h3>
-                    <p style="margin:2px 0; font-size:0.8rem; color:#888;">${i.color} ${i.memory ? '| '+i.memory+'Gb' : ''}</p>
-                    <p style="margin:0; font-weight:bold; color:${i.status === 'sold' ? 'var(--success)' : 'var(--gold)'}">
-                        ${i.status === 'sold' ? (i.sellPrice-(i.buy+i.rep))+' ₽' : (i.buy+i.rep)+' ₽'}
-                    </p>
+        document.getElementById('base-list').innerHTML = filtered.map(i => {
+            let warrantyHtml = '';
+            if (i.status === 'sold' && i.sellDate) {
+                const soldDate = new Date(i.sellDate);
+                const diffTime = Math.floor((new Date() - soldDate) / (1000 * 60 * 60 * 24));
+                const daysLeft = 14 - diffTime;
+                
+                if (daysLeft > 0) {
+                    const wClass = daysLeft <= 3 ? 'warranty-warning' : 'warranty-ok';
+                    warrantyHtml = `<div class="warranty-tag ${wClass}">Гарантия: ${daysLeft} дн.</div>`;
+                } else {
+                    warrantyHtml = `<div class="warranty-tag warranty-expired">Гарантия вышла</div>`;
+                }
+            }
+
+            return `
+                <div class="card ${i.status === 'stock' ? 'active' : 'sold'}" onclick="openModal(${i.id})">
+                    <img src="${i.photos[0] || ''}" class="card-img">
+                    <div class="card-info">
+                        <b style="font-size:1rem; display:block;">${i.brand} ${i.model}</b>
+                        <small style="color:var(--text-dim);">${i.color} | ${i.memory}Gb</small>
+                        <div style="font-weight:bold; color:${i.status==='sold'?'#32d74b':'#43e97b'}; margin-top:4px;">
+                            ${i.status==='sold' ? (i.sellPrice-(i.buy+i.rep))+' ₽' : (i.buy+i.rep)+' ₽'}
+                        </div>
+                        ${warrantyHtml}
+                    </div>
                 </div>
-            </div>
-        `).join('') : '<p style="text-align:center; color:#999; margin-top:50px;">Пусто</p>';
+            `;
+        }).join('');
     }
 
     function openModal(id) {
         const item = db.find(i => i.id == id);
-        if(!item) return;
-        const gallery = document.getElementById('m-gallery');
-        gallery.innerHTML = item.photos.length ? item.photos.map(p => `<img src="${p}">`).join('') : '<img src="https://via.placeholder.com/300?text=Без+фото">';
-        document.getElementById('m-title').innerText = `${item.brand} ${item.model}`;
+        document.getElementById('m-gallery').innerHTML = item.photos.length ? item.photos.map(p => `<img src="${p}">`).join('') : '<img src="https://via.placeholder.com/300?text=Нет+фото">';
+        document.getElementById('m-title').innerText = item.model;
         document.getElementById('m-details').innerHTML = `
-            <div class="modal-row"><span class="modal-label">IMEI/SN</span><span class="modal-val">${item.imei || '-'}</span></div>
-            <div class="modal-row"><span class="modal-label">Затраты</span><span class="modal-val">${item.buy + item.rep} ₽</span></div>
-            ${item.status === 'sold' ? `<div class="modal-row"><span class="modal-label">Продажа</span><span class="modal-val" style="color:var(--success)">${item.sellPrice} ₽</span></div>` : ''}
-            <div style="margin-top:10px;"><small style="color:#888">Заметки:</small><p style="margin:4px 0; font-size:0.9rem;">${item.comment || '-'}</p></div>
+            IMEI: ${item.imei || '-'}<br>
+            Затраты: ${item.buy+item.rep}₽<br>
+            ${item.status === 'sold' ? 'Продано за: '+item.sellPrice+'₽' : 'На складе'}<br>
+            Заметки: ${item.comment || '-'}
         `;
-        document.getElementById('btn-delete-item').onclick = () => deleteItem(item.id);
+        document.getElementById('btn-delete-item').onclick = () => { if(confirm('Удалить?')){db=db.filter(x=>x.id!=id); save(); location.reload();} };
         document.getElementById('details-modal').style.display = 'flex';
-    }
-
-    function deleteItem(id) {
-        if(confirm("Удалить?")) {
-            db = db.filter(i => i.id !== id);
-            save(); closeModal(); location.reload();
-        }
     }
 
     function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
 
     function renderSellList() {
         const s = document.getElementById('sell-search').value.toLowerCase();
-        const active = db.filter(i => i.status === 'stock' && (i.brand + i.model + i.imei).toLowerCase().includes(s));
-        document.getElementById('sell-select').innerHTML = active.map(i => `<option value="${i.id}">${i.brand} ${i.model} (${i.buy+i.rep}₽)</option>`).join('');
+        const active = db.filter(i => i.status === 'stock' && (i.model + i.imei).toLowerCase().includes(s));
+        document.getElementById('sell-select').innerHTML = active.map(i => `<option value="${i.id}">${i.model} (${i.imei})</option>`).join('');
     }
 
     function completeSell() {
         const id = document.getElementById('sell-select').value;
         const price = parseFloat(document.getElementById('sell-price').value);
-        if(!id || !price) return alert("Данные!");
+        if(!id || !price) return alert("Выбери товар и цену!");
         const idx = db.findIndex(i => i.id == id);
         db[idx].status = 'sold';
         db[idx].sellPrice = price;
@@ -401,20 +373,15 @@
         let prof = 0, cost = 0;
         sold.forEach(i => { prof += (i.sellPrice - (i.buy+i.rep)); cost += (i.buy+i.rep); });
         document.getElementById('stat-profit').innerText = prof + " ₽";
-        document.getElementById('stat-profit').style.color = prof >= 0 ? "var(--success)" : "var(--danger)";
         document.getElementById('stat-roi').innerText = cost > 0 ? ((prof/cost)*100).toFixed(1) + "%" : "0%";
-        document.getElementById('stat-count').innerText = sold.length;
-        renderChart(sold);
-    }
-
-    function renderChart(data) {
+        
         const ctx = document.getElementById('statChart').getContext('2d');
         if(chartObj) chartObj.destroy();
         chartObj = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: data.map(i => new Date(i.sellDate).toLocaleDateString()),
-                datasets: [{ label: 'Profit', data: data.map(i => i.sellPrice - (i.buy+i.rep)), borderColor: '#9733ee', tension: 0.4 }]
+                labels: sold.map(i => new Date(i.sellDate).toLocaleDateString()),
+                datasets: [{ label: 'Прибыль', data: sold.map(i => i.sellPrice - (i.buy+i.rep)), borderColor: '#43e97b', tension: 0.4 }]
             },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
@@ -422,44 +389,42 @@
 
     function renderHistory() {
         document.getElementById('history-list').innerHTML = logs.map(l => `
-            <div class="stat-card" style="border-left: 4px solid ${l.type==='in'?'#9733ee':'#2ecc71'}">
+            <div class="stat-card" style="border-left: 4px solid ${l.type==='in'?'#43e97b':'#32d74b'}">
                 <div style="font-size:0.85rem;"><b>${l.t}</b><br><small>${l.d}</small></div>
             </div>
         `).join('');
     }
 
-    function save() {
-        localStorage.setItem('resell_db_v8', JSON.stringify(db));
-        localStorage.setItem('resell_logs_v8', JSON.stringify(logs));
-    }
-
+    function save() { localStorage.setItem('resell_db_v8', JSON.stringify(db)); localStorage.setItem('resell_logs_v8', JSON.stringify(logs)); }
     function downloadBackup() {
-        const blob = new Blob([JSON.stringify({db, logs})], {type: "application/json"});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'resell_backup.json'; a.click();
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify({db, logs})], {type: "application/json"}));
+        a.download = 'resell_aurora_db.json'; a.click();
     }
 
-    function importBackup(input) {
-        const file = input.files[0];
-        if (!file) return;
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            try {
-                const data = JSON.parse(e.target.result);
-                if (data.db && data.logs) {
-                    db = data.db; 
-                    logs = data.logs; 
-                    save(); 
-                    alert("Данные успешно импортированы!"); 
-                    location.reload();
-                } else {
-                    alert("Ошибка: Неверный формат файла.");
+    // --- БЛОК ГАРАНТИИ И УВЕДОМЛЕНИЙ ---
+    if (Notification.permission !== 'granted') Notification.requestPermission();
+
+    function checkWarrantyNotifications() {
+        db.filter(i => i.status === 'sold').forEach(item => {
+            const left = 14 - Math.floor((new Date() - new Date(item.sellDate)) / 86400000);
+            const key = `notif_${item.id}_${left}`;
+            
+            // Проверка по заданным дням
+            if ([7, 3, 1, 0].includes(left) && !localStorage.getItem(key)) {
+                if (Notification.permission === 'granted') {
+                    let msg = left === 0 ? `Гарантия на ${item.model} закончилась` : `Осталось ${left} дн. гарантии на ${item.model}`;
+                    new Notification("Resell Pro: Гарантия", { body: msg });
+                    localStorage.setItem(key, "true");
                 }
-            } catch (err) {
-                alert("Ошибка при чтении файла.");
             }
-        };
-        reader.readAsText(file);
+        });
     }
+
+    setInterval(checkWarrantyNotifications, 3600000); // Проверка каждый час
+    checkWarrantyNotifications(); // И при загрузке
+    
+    updateDatalists(); renderAddForm();
 </script>
 </body>
 </html>
