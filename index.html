@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AURORA TRADE-IN</title>
+    <title>FYA - Resell System</title>
     
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -41,8 +41,8 @@
         header {
             background: var(--primary-grad); color: #000;
             padding: 30px 20px 20px; text-align: center;
-            font-size: 1.1rem; font-weight: 800; z-index: 10;
-            letter-spacing: 1px; text-transform: uppercase;
+            font-size: 1.4rem; font-weight: 900; z-index: 10;
+            letter-spacing: 3px;
         }
 
         main { flex: 1; overflow-y: auto; padding: 20px; padding-bottom: 110px; -webkit-overflow-scrolling: touch; }
@@ -53,21 +53,21 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         nav {
-            position: absolute; bottom: 0; width: 100%; height: 90px;
-            background: rgba(28, 28, 30, 0.8); backdrop-filter: blur(20px);
+            position: absolute; bottom: 0; width: 100%; height: 85px;
+            background: rgba(28, 28, 30, 0.9); backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             display: flex; justify-content: space-around;
             align-items: center; border-top: 0.5px solid rgba(255,255,255,0.1); z-index: 20;
-            padding-bottom: 20px;
+            padding-bottom: env(safe-area-inset-bottom, 15px);
         }
 
         nav button {
             background: none; border: none; color: #636366;
-            font-size: 0.6rem; display: flex; flex-direction: column; align-items: center;
-            cursor: pointer; transition: 0.3s;
+            font-size: 0.55rem; display: flex; flex-direction: column; align-items: center;
+            cursor: pointer; flex: 1; min-width: 0;
         }
         nav button.active { color: #43e97b; }
-        nav button i { font-size: 1.4rem; margin-bottom: 5px; }
+        nav button i { font-size: 1.2rem; margin-bottom: 4px; }
 
         .form-group { margin-bottom: 16px; }
         .trade-section { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 20px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); }
@@ -76,36 +76,26 @@
         label { display: block; margin-bottom: 6px; font-weight: 500; color: var(--text-dim); font-size: 0.8rem; }
         
         input, select, textarea {
-            width: 100%; padding: 14px; border: 0.5px solid rgba(255,255,255,0.1); 
-            border-radius: 14px; box-sizing: border-box; font-size: 0.95rem; outline: none; 
-            background: var(--card-bg); color: white; font-family: inherit;
+            width: 100%; padding: 12px; border: 0.5px solid rgba(255,255,255,0.1); 
+            border-radius: 12px; box-sizing: border-box; font-size: 0.95rem; outline: none; 
+            background: var(--card-bg); color: white;
         }
 
         .btn-primary {
-            width: 100%; padding: 18px; background: var(--primary-grad);
-            color: #000; border: none; border-radius: 16px;
+            width: 100%; padding: 16px; background: var(--primary-grad);
+            color: #000; border: none; border-radius: 14px;
             font-size: 1rem; font-weight: 800; cursor: pointer;
-            box-shadow: 0 8px 25px rgba(67, 233, 123, 0.2);
         }
 
-        .card { background: var(--card-bg); padding: 16px; border-radius: 20px; margin-bottom: 12px; display: flex; gap: 15px; position: relative; border: 0.5px solid rgba(255,255,255,0.08); }
-        .card.active::before { content: ''; position: absolute; left: 0; top: 20px; bottom: 20px; width: 4px; border-radius: 0 4px 4px 0; background: #43e97b; box-shadow: 2px 0 10px #43e97b; }
-        .card-img { width: 75px; height: 75px; border-radius: 14px; object-fit: cover; background: #2c2c2e; }
-
-        .warranty-tag { display: inline-block; padding: 2px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 800; margin-top: 6px; text-transform: uppercase; }
-        .warranty-ok { color: var(--success); border: 1px solid var(--success); }
-        .warranty-warning { color: var(--gold); border: 1px solid var(--gold); }
-        .warranty-expired { color: var(--danger); border: 1px solid var(--danger); }
-
-        #details-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(10px); }
-        .modal-content { background: #1c1c1e; width: 90%; border-radius: 28px; padding: 24px; }
-        
-        .filter-row { display: flex; gap: 10px; margin-bottom: 20px; overflow-x: auto; padding: 5px 0; }
-        .filter-btn { padding: 10px 20px; border-radius: 12px; border: none; background: #2c2c2e; color: var(--text-dim); font-weight: 600; cursor: pointer; white-space: nowrap; }
-        .filter-btn.active { background: var(--primary-grad); color: #000; }
+        .card { background: var(--card-bg); padding: 16px; border-radius: 20px; margin-bottom: 12px; display: flex; gap: 15px; border: 0.5px solid rgba(255,255,255,0.08); }
+        .card.active { border-left: 4px solid #43e97b; }
+        .card-img { width: 70px; height: 70px; border-radius: 12px; object-fit: cover; background: #2c2c2e; }
 
         .stat-card { background: var(--card-bg); padding: 18px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .stat-val { font-weight: 800; font-size: 1.3rem; }
+
+        #details-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(10px); }
+        .modal-content { background: #1c1c1e; width: 90%; border-radius: 28px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); }
     </style>
 </head>
 <body>
@@ -115,91 +105,94 @@
 <div id="details-modal" onclick="closeModal()">
     <div class="modal-content" onclick="event.stopPropagation()">
         <div id="m-gallery" style="display:flex; gap:10px; overflow-x:auto; margin-bottom:15px;"></div>
-        <h2 id="m-title" style="margin:0 0 15px 0; font-size:1.3rem; color:white;"></h2>
-        <div id="m-details" style="color: #8e8e93; font-size: 0.9rem;"></div>
-        <button class="btn-primary" style="margin-top:20px;" onclick="closeModal()">Закрыть</button>
-        <button id="btn-delete-item" style="width:100%; background:none; border:none; color:var(--danger); margin-top:20px; font-weight:bold;">Удалить</button>
+        <h2 id="m-title" style="margin:0 0 10px 0; color:white;"></h2>
+        <div id="m-details" style="color: #8e8e93; font-size: 0.9rem; line-height:1.4;"></div>
+        <button id="btn-delete-item" style="width:100%; background:none; border:none; color:var(--danger); margin-top:20px; font-weight:bold;">Удалить запись</button>
+        <button class="btn-primary" style="margin-top:15px;" onclick="closeModal()">Закрыть</button>
     </div>
 </div>
 
 <div id="app-container">
-    <header id="header-title">AURORA STOCK</header>
+    <header id="header-title">FYA</header>
 
     <main>
         <div id="tab-add" class="tab-content active">
             <div class="form-group">
-                <label>Категория</label>
+                <label>Тип устройства</label>
                 <select id="add-type" onchange="updateDatalists(); renderAddForm();">
                     <option value="phone">📱 Смартфон</option>
                     <option value="headphones">🎧 Наушники</option>
                     <option value="watch">⌚ Часы</option>
                 </select>
             </div>
-            <button class="btn-primary" style="background:#2c2c2e; color:white; font-size:0.8rem; padding:12px; margin-bottom:15px;" onclick="document.getElementById('inp-photo').click()">
-                <i class="fa-solid fa-camera"></i> Добавить фото
-            </button>
+            <div style="display:flex; gap:10px; margin-bottom:15px;">
+                <button class="btn-primary" style="background:#2c2c2e; color:white; font-size:0.8rem; flex:1;" onclick="document.getElementById('inp-photo').click()">
+                    <i class="fa-solid fa-camera"></i> Фото
+                </button>
+            </div>
             <input type="file" id="inp-photo" accept="image/*" multiple style="display:none" onchange="handlePhotos(this)">
             <div id="photo-preview-list" style="display:flex; gap:8px; margin-bottom:15px; flex-wrap:wrap;"></div>
             
             <div id="dynamic-form"></div>
             <div style="display:flex; gap:12px;">
-                <div class="form-group" style="flex:1"><label>Закуп</label><input type="number" id="inp-buy" placeholder="₽"></div>
-                <div class="form-group" style="flex:1"><label>Ремонт</label><input type="number" id="inp-repair" value="0"></div>
+                <div class="form-group" style="flex:1"><label>Закуп (₽)</label><input type="number" id="inp-buy"></div>
+                <div class="form-group" style="flex:1"><label>Ремонт (₽)</label><input type="number" id="inp-repair" value="0"></div>
             </div>
             <div class="form-group"><label>Заметки</label><textarea id="inp-comment" rows="2"></textarea></div>
-            <button class="btn-primary" onclick="addItem()">Добавить на склад</button>
+            <button class="btn-primary" onclick="addItem()">Добавить</button>
         </div>
 
         <div id="tab-trade" class="tab-content">
             <div class="trade-section">
-                <div class="section-title"><i class="fa-solid fa-arrow-up"></i> Мы отдаем (Склад)</div>
-                <div class="form-group">
-                    <label>Выбор товара</label>
-                    <select id="trade-out-select"></select>
-                </div>
+                <div class="section-title"><i class="fa-solid fa-arrow-up"></i> Отдаем со склада</div>
+                <select id="trade-out-select"></select>
             </div>
-
             <div class="trade-section">
-                <div class="section-title"><i class="fa-solid fa-arrow-down"></i> Мы получаем (Клиент)</div>
-                <div class="form-group"><label>Бренд</label><input id="tr-brand" list="brands-dl" placeholder="Apple"></div>
-                <div class="form-group"><label>Модель</label><input id="tr-model" list="models-dl" placeholder="iPhone 13"></div>
-                <div style="display:flex; gap:10px;">
-                    <div class="form-group" style="flex:1"><label>Память</label><input id="tr-memory" type="number" placeholder="Гб"></div>
-                    <div class="form-group" style="flex:1"><label>Цвет</label><input id="tr-color"></div>
+                <div class="section-title"><i class="fa-solid fa-arrow-down"></i> Получаем от клиента</div>
+                <div class="form-group"><label>Бренд / Модель</label>
+                    <div style="display:flex; gap:5px;">
+                        <input id="tr-brand" list="brands-dl" placeholder="Бренд" style="flex:1">
+                        <input id="tr-model" list="models-dl" placeholder="Модель" style="flex:2">
+                    </div>
                 </div>
-                <div class="form-group"><label>IMEI / SN</label><input id="tr-imei"></div>
-                <div class="form-group"><label>Описание состояния</label><textarea id="tr-comment" rows="2" placeholder="Царапины, АКБ %..."></textarea></div>
+                <div style="display:flex; gap:10px;">
+                    <input id="tr-memory" type="number" placeholder="Гб" style="flex:1">
+                    <input id="tr-color" placeholder="Цвет" style="flex:1">
+                </div>
+                <input id="tr-imei" placeholder="IMEI / SN" style="margin-top:10px;">
+                <textarea id="tr-comment" rows="2" placeholder="Состояние..." style="margin-top:10px;"></textarea>
             </div>
-
-            <div class="form-group">
-                <label>Сумма доплаты (от клиента нам)</label>
-                <input type="number" id="tr-cash" placeholder="0 если нет доплаты">
-            </div>
-            <button class="btn-primary" onclick="completeTradeIn()">Провести Трейд-ин</button>
+            <div class="form-group"><label>Доплата нам (₽)</label><input type="number" id="tr-cash" placeholder="0"></div>
+            <button class="btn-primary" onclick="completeTradeIn()">Оформить обмен</button>
         </div>
 
         <div id="tab-sell" class="tab-content">
-            <div class="form-group"><label>Поиск</label><input type="text" id="sell-search" placeholder="IMEI или Модель..." oninput="renderSellList()"></div>
-            <div class="form-group"><label>Товар</label><select id="sell-select"></select></div>
-            <div class="form-group"><label>Цена продажи</label><input type="number" id="sell-price" placeholder="₽"></div>
+            <div class="form-group"><label>Поиск</label><input type="text" id="sell-search" placeholder="Модель или IMEI..." oninput="renderSellList()"></div>
+            <div class="form-group"><label>Выбрать товар</label><select id="sell-select"></select></div>
+            <div class="form-group"><label>Цена продажи</label><input type="number" id="sell-price"></div>
             <button class="btn-primary" onclick="completeSell()">Продано</button>
         </div>
 
         <div id="tab-base" class="tab-content">
-            <div class="filter-row">
-                <button class="filter-btn active" onclick="renderBase('phone', this)">Смартфоны</button>
-                <button class="filter-btn" onclick="renderBase('headphones', this)">Наушники</button>
+            <div class="filter-row" style="display:flex; gap:8px; overflow-x:auto; padding-bottom:10px;">
+                <button class="filter-btn active" onclick="renderBase('phone', this)">Телефоны</button>
+                <button class="filter-btn" onclick="renderBase('headphones', this)">Уши</button>
                 <button class="filter-btn" onclick="renderBase('watch', this)">Часы</button>
             </div>
             <div id="base-list"></div>
         </div>
 
+        <div id="tab-history" class="tab-content">
+            <h3 style="margin-top:0;">История операций</h3>
+            <div id="history-list"></div>
+        </div>
+
         <div id="tab-stats" class="tab-content">
+            <div class="stat-card"><span>Общая прибыль</span><span id="stat-profit" class="stat-val" style="color:#43e97b">0 ₽</span></div>
             <div style="background:#1c1c1e; border-radius:18px; padding:15px; height:180px; margin-bottom:15px;"><canvas id="statChart"></canvas></div>
-            <div class="stat-card"><span>Прибыль</span><span id="stat-profit" class="stat-val">0 ₽</span></div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                <button class="btn-primary" onclick="downloadBackup()" style="background:#2c2c2e; color:white; font-size:0.7rem;">Экспорт</button>
-                <button class="btn-primary" onclick="document.getElementById('import-file').click()" style="background:#2c2c2e; color:white; font-size:0.7rem;">Импорт</button>
+                <button class="btn-primary" onclick="downloadBackup()" style="background:#2c2c2e; color:white; font-size:0.7rem;">Экспорт JSON</button>
+                <button class="btn-primary" onclick="document.getElementById('import-file').click()" style="background:#2c2c2e; color:white; font-size:0.7rem;">Импорт JSON</button>
             </div>
             <input type="file" id="import-file" style="display:none" accept=".json" onchange="importBackup(this)">
         </div>
@@ -207,94 +200,28 @@
 
     <nav>
         <button class="active" onclick="showTab('add', this)"><i class="fa-solid fa-plus-circle"></i>Ввод</button>
-        <button onclick="showTab('trade', this)"><i class="fa-solid fa-right-left"></i>Трейд-ин</button>
-        <button onclick="showTab('sell', this)"><i class="fa-solid fa-cash-register"></i>Продать</button>
-        <button onclick="showTab('base', this)"><i class="fa-solid fa-boxes-stacked"></i>Склад</button>
-        <button onclick="showTab('stats', this)"><i class="fa-solid fa-chart-line"></i>Сейф</button>
+        <button onclick="showTab('trade', this)"><i class="fa-solid fa-right-left"></i>Обмен</button>
+        <button onclick="showTab('sell', this)"><i class="fa-solid fa-cart-shopping"></i>Продажа</button>
+        <button onclick="showTab('base', this)"><i class="fa-solid fa-box"></i>Склад</button>
+        <button onclick="showTab('history', this)"><i class="fa-solid fa-clock-rotate-left"></i>Лог</button>
+        <button onclick="showTab('stats', this)"><i class="fa-solid fa-vault"></i>Сейф</button>
     </nav>
 </div>
 
 <script>
-    let db = JSON.parse(localStorage.getItem('resell_db_v8')) || [];
-    let logs = JSON.parse(localStorage.getItem('resell_logs_v8')) || [];
+    let db = JSON.parse(localStorage.getItem('fya_db')) || [];
+    let logs = JSON.parse(localStorage.getItem('fya_logs')) || [];
     let tempPhotos = [];
     let chartObj = null;
 
-    const GLOBAL_DATABASE = {
-        brands: ["Apple", "Samsung", "Xiaomi", "Google", "Sony", "Realme"],
-        models: {
-            phone: ["iPhone 16 Pro Max", "iPhone 15 Pro", "iPhone 13", "Galaxy S24"],
-            headphones: ["AirPods Pro 2", "AirPods 3"],
-            watch: ["Apple Watch 10", "Ultra 2"]
-        }
-    };
-
-    function updateDatalists() {
-        const type = document.getElementById('add-type').value;
-        let html = `<datalist id="brands-dl">${GLOBAL_DATABASE.brands.map(b => `<option value="${b}">`).join('')}</datalist>`;
-        html += `<datalist id="models-dl">${GLOBAL_DATABASE.models[type].map(m => `<option value="${m}">`).join('')}</datalist>`;
-        document.getElementById('datalist-container').innerHTML = html;
+    function save() {
+        localStorage.setItem('fya_db', JSON.stringify(db));
+        localStorage.setItem('fya_logs', JSON.stringify(logs));
     }
 
-    function renderAddForm() {
-        const type = document.getElementById('add-type').value;
-        const div = document.getElementById('dynamic-form');
-        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" list="brands-dl"></div>
-                 <div class="form-group"><label>Модель</label><input id="b-model" list="models-dl"></div>
-                 <div class="form-group"><label>Цвет</label><input id="b-color"></div>`;
-        if(type === 'phone') h += `<div class="form-group"><label>Память (Гб)</label><input type="number" id="b-memory"></div>`;
-        h += `<div class="form-group"><label>IMEI / SN</label><input id="b-imei"></div>`;
-        div.innerHTML = h;
-    }
-
-    async function handlePhotos(input) {
-        tempPhotos = [];
-        const preview = document.getElementById('photo-preview-list');
-        preview.innerHTML = "";
-        for (let file of input.files) {
-            const data = await readFile(file);
-            tempPhotos.push(data);
-            preview.innerHTML += `<img src="${data}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">`;
-        }
-    }
-
-    function readFile(file) {
-        return new Promise(res => {
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                const img = new Image();
-                img.src = e.target.result;
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const ctx = canvas.getContext('2d');
-                    canvas.width = 600; canvas.height = 600;
-                    ctx.drawImage(img, 0, 0, 600, 600);
-                    res(canvas.toDataURL('image/jpeg', 0.6));
-                };
-            };
-            reader.readAsDataURL(file);
-        });
-    }
-
-    function addItem() {
-        const item = {
-            id: Date.now(),
-            type: document.getElementById('add-type').value,
-            brand: document.getElementById('b-brand').value,
-            model: document.getElementById('b-model').value,
-            color: document.getElementById('b-color').value,
-            imei: document.getElementById('b-imei').value,
-            memory: document.getElementById('b-memory')?.value || '',
-            buy: parseFloat(document.getElementById('inp-buy').value || 0),
-            rep: parseFloat(document.getElementById('inp-repair').value || 0),
-            comment: document.getElementById('inp-comment').value,
-            photos: tempPhotos,
-            status: 'stock',
-            date: new Date().toISOString()
-        };
-        if(!item.brand || !item.buy) return alert("Бренд и цена обязательны!");
-        db.push(item);
-        save(); location.reload();
+    function addLog(msg, type) {
+        logs.unshift({ msg, type, date: new Date().toLocaleString() });
+        save();
     }
 
     function showTab(name, btn) {
@@ -303,85 +230,157 @@
         document.getElementById('tab-' + name).classList.add('active');
         btn.classList.add('active');
         if(name === 'trade') renderTradeLists();
-        if(name === 'base') renderBase('phone', document.querySelectorAll('.filter-btn')[0]);
+        if(name === 'base') renderBase('phone', document.querySelector('.filter-btn'));
         if(name === 'stats') updateStats();
+        if(name === 'history') renderHistory();
+        if(name === 'sell') renderSellList();
+    }
+
+    function updateDatalists() {
+        const type = document.getElementById('add-type').value;
+        const brands = ["Apple", "Samsung", "Xiaomi", "Google", "Sony"];
+        document.getElementById('datalist-container').innerHTML = `
+            <datalist id="brands-dl">${brands.map(b => `<option value="${b}">`).join('')}</datalist>
+            <datalist id="models-dl"><option value="iPhone 15 Pro"><option value="iPhone 13"></datalist>`;
+    }
+
+    function renderAddForm() {
+        const type = document.getElementById('add-type').value;
+        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" list="brands-dl"></div>
+                 <div class="form-group"><label>Модель</label><input id="b-model" list="models-dl"></div>
+                 <div style="display:flex; gap:10px;">
+                    <input id="b-color" placeholder="Цвет" style="flex:1">
+                    ${type==='phone' ? '<input id="b-memory" type="number" placeholder="Гб" style="flex:1">' : ''}
+                 </div>
+                 <div class="form-group" style="margin-top:10px;"><label>IMEI / SN</label><input id="b-imei"></div>`;
+        document.getElementById('dynamic-form').innerHTML = h;
+    }
+
+    async function handlePhotos(input) {
+        tempPhotos = [];
+        const preview = document.getElementById('photo-preview-list');
+        preview.innerHTML = "Загрузка...";
+        for (let file of input.files) {
+            const data = await readFile(file);
+            tempPhotos.push(data);
+        }
+        preview.innerHTML = tempPhotos.map(p => `<img src="${p}" style="width:50px; height:50px; border-radius:8px; object-fit:cover;">`).join('');
+    }
+
+    function readFile(file) {
+        return new Promise(res => {
+            const reader = new FileReader();
+            reader.onload = (e) => res(e.target.result);
+            reader.readAsDataURL(file);
+        });
+    }
+
+    function addItem() {
+        const buy = parseFloat(document.getElementById('inp-buy').value);
+        if(!buy) return alert("Укажите цену закупа!");
+        const item = {
+            id: Date.now(),
+            type: document.getElementById('add-type').value,
+            brand: document.getElementById('b-brand').value,
+            model: document.getElementById('b-model').value,
+            color: document.getElementById('b-color').value,
+            imei: document.getElementById('b-imei').value,
+            memory: document.getElementById('b-memory')?.value || '',
+            buy: buy,
+            rep: parseFloat(document.getElementById('inp-repair').value || 0),
+            comment: document.getElementById('inp-comment').value,
+            photos: tempPhotos,
+            status: 'stock',
+            date: new Date().toISOString()
+        };
+        db.push(item);
+        addLog(`Приход: ${item.brand} ${item.model}`, 'in');
+        location.reload();
     }
 
     function renderTradeLists() {
-        const active = db.filter(i => i.status === 'stock');
-        document.getElementById('trade-out-select').innerHTML = active.map(i => `<option value="${i.id}">${i.brand} ${i.model} (${i.buy+i.rep}₽)</option>`).join('');
+        const stock = db.filter(i => i.status === 'stock');
+        document.getElementById('trade-out-select').innerHTML = stock.map(i => `<option value="${i.id}">${i.brand} ${i.model} (${i.buy+i.rep}₽)</option>`).join('');
     }
 
     function completeTradeIn() {
         const outId = document.getElementById('trade-out-select').value;
         const brand = document.getElementById('tr-brand').value;
-        const model = document.getElementById('tr-model').value;
         const cash = document.getElementById('tr-cash').value;
-
-        if(!outId || !brand || !model || cash === "") return alert("Заполни все поля! Доплата может быть 0, но не пустой.");
+        if(!outId || !brand || cash === "") return alert("Заполните поля!");
 
         const outItem = db.find(i => i.id == outId);
-        const cashValue = parseFloat(cash);
-
-        // 1. Создаем устройство клиента
         const inItem = {
-            id: Date.now(),
-            type: 'phone', // По умолчанию телефон
-            brand: brand,
-            model: model,
+            id: Date.now(), type: 'phone', brand: brand,
+            model: document.getElementById('tr-model').value,
             memory: document.getElementById('tr-memory').value,
             color: document.getElementById('tr-color').value,
             imei: document.getElementById('tr-imei').value,
-            comment: document.getElementById('tr-comment').value + " (Получен по Трейд-ин)",
-            buy: (outItem.buy + outItem.rep) - cashValue, // Себестоимость = цена нашего - доплата
-            rep: 0,
-            status: 'stock',
-            photos: [],
-            date: new Date().toISOString()
+            buy: (outItem.buy + outItem.rep) - parseFloat(cash),
+            rep: 0, status: 'stock', photos: [], date: new Date().toISOString(),
+            comment: "Трейд-ин: " + document.getElementById('tr-comment').value
         };
 
-        // 2. Списываем наше устройство
         const idx = db.findIndex(i => i.id == outId);
         db[idx].status = 'sold';
-        db[idx].sellPrice = (outItem.buy + outItem.rep); // Условно в ноль для статистики
+        db[idx].sellPrice = (outItem.buy + outItem.rep);
         db[idx].sellDate = new Date().toISOString();
-
+        
         db.push(inItem);
-        save(); alert("Трейд-ин успешно проведен!"); location.reload();
+        addLog(`Трейд-ин: отдан ${outItem.model}, принят ${inItem.model}`, 'trade');
+        alert("Обмен завершен"); location.reload();
     }
 
     function renderBase(type, btn) {
-        if(btn) {
-            document.querySelectorAll('#tab-base .filter-btn').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-        }
-        const filtered = db.filter(i => i.type === type);
-        document.getElementById('base-list').innerHTML = filtered.map(i => {
-            let warranty = '';
-            if(i.status === 'sold') {
-                const days = 14 - Math.floor((new Date() - new Date(i.sellDate)) / 86400000);
-                warranty = `<div class="warranty-tag ${days <= 0 ? 'warranty-expired' : (days <= 3 ? 'warranty-warning' : 'warranty-ok')}">${days <= 0 ? 'Срок вышел' : 'Гарантия: '+days+'д'}</div>`;
-            }
-            return `
-                <div class="card ${i.status === 'stock' ? 'active' : ''}" onclick="openModal(${i.id})">
-                    <img src="${i.photos[0] || 'https://via.placeholder.com/75'}" class="card-img">
-                    <div style="flex:1">
-                        <b>${i.brand} ${i.model}</b><br>
-                        <small style="color:var(--text-dim)">${i.color} | ${i.memory}Gb</small>
-                        <div style="margin-top:5px; font-weight:bold; color:#43e97b">${i.status === 'sold' ? 'Продано' : (i.buy+i.rep)+' ₽'}</div>
-                        ${warranty}
-                    </div>
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        const list = db.filter(i => i.type === type);
+        document.getElementById('base-list').innerHTML = list.map(i => `
+            <div class="card ${i.status === 'stock' ? 'active' : ''}" onclick="openModal(${i.id})">
+                <img src="${i.photos[0] || 'https://via.placeholder.com/70?text=No+Photo'}" class="card-img">
+                <div style="flex:1">
+                    <div style="font-weight:bold;">${i.brand} ${i.model}</div>
+                    <small style="color:var(--text-dim)">${i.imei || 'Нет IMEI'}</small>
+                    <div style="color:#43e97b; font-weight:800; margin-top:5px;">${i.status==='sold'?'ПРОДАНО':(i.buy+i.rep)+' ₽'}</div>
                 </div>
-            `;
-        }).join('');
+            </div>
+        `).join('');
+    }
+
+    function renderHistory() {
+        document.getElementById('history-list').innerHTML = logs.map(l => `
+            <div style="padding:10px; border-bottom:1px solid #2c2c2e; font-size:0.85rem;">
+                <div style="color:var(--text-dim); font-size:0.7rem;">${l.date}</div>
+                <div>${l.msg}</div>
+            </div>
+        `).join('');
+    }
+
+    function renderSellList() {
+        const s = document.getElementById('sell-search').value.toLowerCase();
+        const stock = db.filter(i => i.status === 'stock' && (i.model+i.imei).toLowerCase().includes(s));
+        document.getElementById('sell-select').innerHTML = stock.map(i => `<option value="${i.id}">${i.brand} ${i.model} (${i.imei})</option>`).join('');
+    }
+
+    function completeSell() {
+        const id = document.getElementById('sell-select').value;
+        const price = parseFloat(document.getElementById('sell-price').value);
+        if(!id || !price) return alert("Укажите цену!");
+        const idx = db.findIndex(i => i.id == id);
+        db[idx].status = 'sold';
+        db[idx].sellPrice = price;
+        db[idx].sellDate = new Date().toISOString();
+        addLog(`Продажа: ${db[idx].model} за ${price}₽`, 'out');
+        location.reload();
     }
 
     function openModal(id) {
-        const item = db.find(i => i.id == id);
-        document.getElementById('m-title').innerText = item.model;
-        document.getElementById('m-details').innerHTML = `Бренд: ${item.brand}<br>IMEI: ${item.imei}<br>Себестоимость: ${item.buy+item.rep}₽<br>Инфо: ${item.comment}`;
-        document.getElementById('details-modal').style.display = 'flex';
+        const i = db.find(x => x.id == id);
+        document.getElementById('m-title').innerText = i.model;
+        document.getElementById('m-gallery').innerHTML = i.photos.map(p => `<img src="${p}" style="height:150px; border-radius:10px;">`).join('');
+        document.getElementById('m-details').innerHTML = `Бренд: ${i.brand}<br>IMEI: ${i.imei}<br>Себестоимость: ${i.buy+i.rep}₽<br>Инфо: ${i.comment || '-'}`;
         document.getElementById('btn-delete-item').onclick = () => { if(confirm('Удалить?')){db=db.filter(x=>x.id!=id); save(); location.reload();} };
+        document.getElementById('details-modal').style.display = 'flex';
     }
 
     function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
@@ -390,24 +389,27 @@
         const sold = db.filter(i => i.status === 'sold');
         let prof = 0; sold.forEach(i => prof += (i.sellPrice - (i.buy+i.rep)));
         document.getElementById('stat-profit').innerText = prof + " ₽";
-        
         const ctx = document.getElementById('statChart').getContext('2d');
         if(chartObj) chartObj.destroy();
         chartObj = new Chart(ctx, {
             type: 'line',
-            data: { labels: sold.map(s => new Date(s.sellDate).toLocaleDateString()), datasets: [{label:'Прибыль', data: sold.map(s => s.sellPrice - (s.buy+s.rep)), borderColor:'#43e97b', tension:0.4}] },
-            options: { responsive: true, maintainAspectRatio: false, plugins:{legend:{display:false}} }
+            data: { labels: sold.map(s => ''), datasets: [{label:'Прибыль', data: sold.map(s => s.sellPrice - (s.buy+s.rep)), borderColor:'#43e97b'}] },
+            options: { responsive: true, maintainAspectRatio: false }
         });
     }
 
-    function save() { localStorage.setItem('resell_db_v8', JSON.stringify(db)); }
-    function downloadBackup() { 
-        const blob = new Blob([JSON.stringify({db})], {type: "application/json"});
-        const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = 'aurora_backup.json'; a.click();
+    function downloadBackup() {
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(new Blob([JSON.stringify({db, logs})], {type:"application/json"}));
+        a.download = 'fya_backup.json'; a.click();
     }
+
     function importBackup(input) {
         const reader = new FileReader();
-        reader.onload = (e) => { const data = JSON.parse(e.target.result); if(data.db){ db = data.db; save(); location.reload(); } };
+        reader.onload = (e) => {
+            const data = JSON.parse(e.target.result);
+            if(data.db) { db = data.db; logs = data.logs || []; save(); location.reload(); }
+        };
         reader.readAsText(input.files[0]);
     }
 
