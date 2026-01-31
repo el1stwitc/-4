@@ -88,11 +88,15 @@
         }
 
         .card { background: var(--card-bg); padding: 16px; border-radius: 20px; margin-bottom: 12px; display: flex; gap: 15px; border: 0.5px solid rgba(255,255,255,0.08); position: relative; }
-        .card.active::before { content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 4px; border-radius: 0 4px 4px 0; background: #43e97b; box-shadow: 2px 0 10px #43e97b; }
-        .card.reserved::before { background: var(--gold); box-shadow: 2px 0 10px var(--gold); }
-        .card.sold::before { background: #8e8e93; }
+        .card.stock::before { content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 4px; border-radius: 0 4px 4px 0; background: #43e97b; }
+        .card.reserved::before { content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 4px; border-radius: 0 4px 4px 0; background: var(--gold); }
+        .card.sold::before { content: ''; position: absolute; left: 0; top: 15px; bottom: 15px; width: 4px; border-radius: 0 4px 4px 0; background: #8e8e93; }
 
         .card-img { width: 75px; height: 75px; border-radius: 14px; object-fit: cover; background: #2c2c2e; }
+
+        .warranty-badge { font-size: 0.65rem; padding: 4px 8px; border-radius: 6px; font-weight: 700; text-transform: uppercase; margin-top: 5px; display: inline-block; }
+        .warranty-active { background: rgba(50, 215, 75, 0.15); color: var(--success); }
+        .warranty-expired { background: rgba(255, 69, 58, 0.15); color: var(--danger); }
 
         .stat-card { background: var(--card-bg); padding: 18px; border-radius: 18px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
         .stat-val { font-weight: 800; font-size: 1.3rem; }
@@ -102,12 +106,12 @@
 
         #checklist-box { display: none; background: #2c2c2e; padding: 15px; border-radius: 14px; margin-bottom: 15px; }
         .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .check-item { background: #1c1c1e; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.8rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; }
+        .check-item { background: #1c1c1e; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.8rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
         .check-item.bad { background: rgba(255, 69, 58, 0.2); border-color: var(--danger); color: var(--danger); }
         .check-item.good { background: rgba(50, 215, 75, 0.2); border-color: var(--success); color: var(--success); }
 
         #details-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(10px); }
-        .modal-content { background: #1c1c1e; width: 90%; border-radius: 28px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); overflow-y: auto; max-height: 80%; }
+        .modal-content { background: #1c1c1e; width: 90%; border-radius: 28px; padding: 24px; border: 1px solid rgba(255,255,255,0.1); max-height: 85vh; overflow-y: auto; }
     </style>
 </head>
 <body>
@@ -125,7 +129,7 @@
 </div>
 
 <div id="app-container">
-    <header id="header-title">FYA</header>
+    <header>FYA</header>
 
     <main>
         <div id="tab-add" class="tab-content active">
@@ -139,14 +143,14 @@
             </div>
             
             <button class="btn-primary" style="background:#2c2c2e; color:var(--text-dim); font-size:0.8rem; margin-bottom:15px; display:flex; justify-content:center; align-items:center; gap:8px;" onclick="toggleChecklist()">
-                <i class="fa-solid fa-list-check"></i> Открыть чек-лист проверки
+                <i class="fa-solid fa-list-check"></i> Чек-лист проверки
             </button>
             <div id="checklist-box">
                 <div class="check-grid">
                     <div class="check-item" onclick="toggleCheck(this, 'FaceID/TouchID')">FaceID / TouchID</div>
                     <div class="check-item" onclick="toggleCheck(this, 'TrueTone')">TrueTone</div>
                     <div class="check-item" onclick="toggleCheck(this, 'Аккумулятор')">Аккумулятор</div>
-                    <div class="check-item" onclick="toggleCheck(this, 'Камеры')">Камеры (все)</div>
+                    <div class="check-item" onclick="toggleCheck(this, 'Камеры')">Камеры</div>
                     <div class="check-item" onclick="toggleCheck(this, 'Микрофоны')">Микрофоны</div>
                     <div class="check-item" onclick="toggleCheck(this, 'Динамики')">Динамики</div>
                     <div class="check-item" onclick="toggleCheck(this, 'Связь/Wi-Fi')">Связь / Wi-Fi</div>
@@ -198,10 +202,10 @@
             <div class="form-group"><label>Выбрать товар</label><select id="sell-select"></select></div>
             <div class="form-group"><label>Гарантия</label>
                 <select id="sell-warranty">
-                    <option value="Нет">Без гарантии</option>
-                    <option value="14 дней">14 дней</option>
-                    <option value="1 месяц">1 месяц</option>
-                    <option value="3 месяца">3 месяца</option>
+                    <option value="0">Без гарантии</option>
+                    <option value="14">14 дней</option>
+                    <option value="30">1 месяц</option>
+                    <option value="90">3 месяца</option>
                 </select>
             </div>
             <div class="form-group"><label>Цена продажи</label><input type="number" id="sell-price"></div>
@@ -224,7 +228,7 @@
         </div>
 
         <div id="tab-stats" class="tab-content">
-            <div class="stat-card"><span>Общая прибыль</span><span id="stat-profit" class="stat-val" style="color:#43e97b">0 ₽</span></div>
+            <div class="stat-card"><span>Прибыль</span><span id="stat-profit" class="stat-val" style="color:#43e97b">0 ₽</span></div>
             <div style="background:#1c1c1e; border-radius:18px; padding:15px; height:180px; margin-bottom:15px;"><canvas id="statChart"></canvas></div>
             <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <button class="btn-primary" onclick="downloadBackup()" style="background:#2c2c2e; color:white; font-size:0.7rem;">Экспорт</button>
@@ -281,14 +285,14 @@
 
     function renderAddForm() {
         const type = document.getElementById('add-type').value;
-        let h = `<div class="form-group"><label>Бренд</label><input id="b-brand" list="brands-dl"></div>
-                 <div class="form-group"><label>Модель</label><input id="b-model" list="models-dl"></div>
-                 <div style="display:flex; gap:10px;">
-                    <input id="b-color" placeholder="Цвет" style="flex:1">
-                    ${type==='phone' ? '<input id="b-memory" type="number" placeholder="Гб" style="flex:1">' : ''}
-                 </div>
-                 <div class="form-group" style="margin-top:10px;"><label>IMEI / SN</label><input id="b-imei"></div>`;
-        document.getElementById('dynamic-form').innerHTML = h;
+        document.getElementById('dynamic-form').innerHTML = `
+            <div class="form-group"><label>Бренд</label><input id="b-brand" list="brands-dl"></div>
+            <div class="form-group"><label>Модель</label><input id="b-model" list="models-dl"></div>
+            <div style="display:flex; gap:10px;">
+                <input id="b-color" placeholder="Цвет" style="flex:1">
+                ${type==='phone' ? '<input id="b-memory" type="number" placeholder="Гб" style="flex:1">' : ''}
+            </div>
+            <div class="form-group" style="margin-top:10px;"><label>IMEI / SN</label><input id="b-imei"></div>`;
     }
 
     function toggleChecklist() {
@@ -298,12 +302,9 @@
 
     function toggleCheck(el, name) {
         if(el.classList.contains('good')) {
-            el.classList.remove('good');
-            el.classList.add('bad');
+            el.classList.remove('good'); el.classList.add('bad');
             const comment = document.getElementById('inp-comment');
-            if(!comment.value.includes(name + ": Не ок")) {
-                comment.value += (comment.value ? "\n" : "") + name + ": Не ок";
-            }
+            comment.value += (comment.value ? "\n" : "") + name + ": Не ок";
         } else if(el.classList.contains('bad')) {
             el.classList.remove('bad');
         } else {
@@ -332,7 +333,7 @@
 
     function addItem() {
         const buy = parseFloat(document.getElementById('inp-buy').value);
-        if(!buy) return alert("Укажите цену закупа!");
+        if(!buy) return alert("Цена закупа!");
         const item = {
             id: Date.now(),
             type: document.getElementById('add-type').value,
@@ -362,7 +363,7 @@
         const outId = document.getElementById('trade-out-select').value;
         const brand = document.getElementById('tr-brand').value;
         const cash = parseFloat(document.getElementById('tr-cash').value || 0);
-        if(!outId || !brand) return alert("Заполните все поля!");
+        if(!outId || !brand) return alert("Заполните поля!");
 
         const outItem = db.find(i => i.id == outId);
         const inItem = {
@@ -380,102 +381,95 @@
         db[idx].status = 'sold';
         db[idx].sellPrice = (outItem.buy + outItem.rep);
         db[idx].sellDate = new Date().toISOString();
+        db[idx].warrantyDays = 0;
         
         db.push(inItem);
         addLog(`Обмен: отдан ${outItem.model}, принят ${inItem.model}`, 'trade');
         alert("Трейд-ин завершен"); location.reload();
     }
 
+    function getWarrantyStatus(sellDateISO, days) {
+        if (!days || days == 0) return { text: "Без гарантии", class: "warranty-expired" };
+        const expiryDate = new Date(sellDateISO);
+        expiryDate.setDate(expiryDate.getDate() + parseInt(days));
+        const diff = expiryDate - new Date();
+        const diffDays = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        return diff > 0 ? { text: `🛡️ Гарантия: ${diffDays} дн.`, class: "warranty-active" } : { text: "🚫 Истекла", class: "warranty-expired" };
+    }
+
     function renderBase(type, btn) {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
+        let list = type === 'sold' ? db.filter(i => i.status === 'sold') : db.filter(i => i.type === type && i.status !== 'sold');
         
-        let list = [];
-        if(type === 'sold') {
-            list = db.filter(i => i.status === 'sold');
-        } else {
-            list = db.filter(i => i.type === type && i.status !== 'sold');
-        }
-        
-        document.getElementById('base-list').innerHTML = list.map(i => `
-            <div class="card ${i.status}" onclick="openModal(${i.id})">
-                <img src="${i.photos[0] || 'https://via.placeholder.com/75?text=No+Photo'}" class="card-img">
-                <div style="flex:1">
-                    <div style="font-weight:bold; font-size:1rem;">${i.brand} ${i.model}</div>
-                    <small style="color:var(--text-dim)">${i.color} | ${i.memory ? i.memory+'Гб | ' : ''} ${i.imei || 'Нет IMEI'}</small>
-                    <div class="status-text" style="color:${i.status === 'sold' ? '#8e8e93' : '#43e97b'}; font-weight:800; margin-top:5px;">
-                        ${i.status === 'sold' ? 'ПРОДАНО (' + i.sellPrice + '₽)' : (i.buy+i.rep) + ' ₽'}
+        document.getElementById('base-list').innerHTML = list.map(i => {
+            let warrantyHtml = '';
+            if (i.status === 'sold') {
+                const w = getWarrantyStatus(i.sellDate, i.warrantyDays);
+                warrantyHtml = `<div class="warranty-badge ${w.class}">${w.text}</div>`;
+            }
+            return `
+                <div class="card ${i.status}" onclick="openModal(${i.id})">
+                    <img src="${i.photos[0] || 'https://via.placeholder.com/75'}" class="card-img">
+                    <div style="flex:1">
+                        <div style="font-weight:bold;">${i.brand} ${i.model}</div>
+                        <small style="color:var(--text-dim)">${i.color} | ${i.imei}</small><br>
+                        ${warrantyHtml}
+                        <div style="color:#43e97b; font-weight:800; margin-top:5px;">
+                            ${i.status === 'sold' ? i.sellPrice + ' ₽' : (i.buy+i.rep) + ' ₽'}
+                        </div>
                     </div>
-                </div>
-            </div>
-        `).join('');
-    }
-
-    function renderHistory() {
-        document.getElementById('history-list').innerHTML = logs.map(l => `
-            <div style="padding:12px; border-bottom:1px solid #2c2c2e; font-size:0.85rem;">
-                <div style="color:var(--text-dim); font-size:0.7rem; margin-bottom:4px;">${l.date}</div>
-                <div style="font-weight:500;">${l.msg}</div>
-            </div>
-        `).join('');
+                </div>`;
+        }).join('');
     }
 
     function renderSellList() {
         const s = document.getElementById('sell-search').value.toLowerCase();
         const stock = db.filter(i => (i.status === 'stock' || i.status === 'reserved') && (i.model+i.imei).toLowerCase().includes(s));
-        document.getElementById('sell-select').innerHTML = stock.map(i => `<option value="${i.id}">${i.brand} ${i.model} (${i.imei})</option>`).join('');
+        document.getElementById('sell-select').innerHTML = stock.map(i => `<option value="${i.id}">${i.model} (${i.imei})</option>`).join('');
     }
 
     function completeSell() {
         const id = document.getElementById('sell-select').value;
         const price = parseFloat(document.getElementById('sell-price').value);
-        if(!id || !price) return alert("Укажите цену!");
-        
+        const wDays = document.getElementById('sell-warranty').value;
+        if(!id || !price) return alert("Цена!");
         const idx = db.findIndex(i => i.id == id);
         db[idx].status = 'sold';
         db[idx].sellPrice = price;
-        db[idx].warranty = document.getElementById('sell-warranty').value;
+        db[idx].warrantyDays = wDays;
         db[idx].sellDate = new Date().toISOString();
-        
         addLog(`Продажа: ${db[idx].model} за ${price}₽`, 'out');
         location.reload();
     }
 
     function openModal(id) {
         const i = db.find(x => x.id == id);
-        document.getElementById('m-title').innerText = i.model;
-        document.getElementById('m-gallery').innerHTML = i.photos.length ? i.photos.map(p => `<img src="${p}" style="height:150px; border-radius:10px;">`).join('') : '<small>Нет фото</small>';
-        
-        let details = `Бренд: ${i.brand}<br>IMEI/SN: ${i.imei}<br>Себестоимость: ${i.buy+i.rep}₽<br>`;
+        let details = `IMEI: ${i.imei}<br>Себестоимость: ${i.buy+i.rep}₽<br>Заметки: ${i.comment || '-'}`;
         if(i.status === 'sold') {
-            details += `<span style="color:#43e97b">Цена продажи: ${i.sellPrice}₽</span><br>Гарантия: ${i.warranty || 'Нет'}<br>`;
+            const w = getWarrantyStatus(i.sellDate, i.warrantyDays);
+            details += `<br><span style="color:#43e97b">Продано за: ${i.sellPrice}₽</span><br>Статус: ${w.text}`;
         }
-        details += `Заметки: ${i.comment || '-'}`;
-        
+        document.getElementById('m-title').innerText = i.model;
+        document.getElementById('m-gallery').innerHTML = i.photos.map(p => `<img src="${p}" style="height:120px; border-radius:10px;">`).join('') || 'Нет фото';
         document.getElementById('m-details').innerHTML = details;
         
-        let actionsHtml = '';
-        if(i.status === 'stock') {
-            actionsHtml = `<button onclick="setReserve(${i.id}, true)" class="btn-primary" style="background:var(--gold); color:black;">Поставить в резерв</button>`;
-        } else if (i.status === 'reserved') {
-            actionsHtml = `<button onclick="setReserve(${i.id}, false)" class="btn-primary" style="background:#2c2c2e;">Снять резерв</button>`;
-        }
-        actionsHtml += `<button style="width:100%; background:none; border:none; color:var(--danger); font-weight:bold; padding:10px;" onclick="deleteItem(${i.id})">Удалить из базы навсегда</button>`;
+        let acts = i.status === 'stock' ? `<button onclick="setReserve(${i.id}, true)" class="btn-primary" style="background:var(--gold); color:black;">В резерв</button>` : 
+                   i.status === 'reserved' ? `<button onclick="setReserve(${i.id}, false)" class="btn-primary" style="background:#2c2c2e;">Снять резерв</button>` : '';
+        acts += `<button style="color:var(--danger); background:none; border:none; padding:15px; font-weight:bold;" onclick="deleteItem(${i.id})">Удалить запись</button>`;
         
-        document.getElementById('m-actions').innerHTML = actionsHtml;
+        document.getElementById('m-actions').innerHTML = acts;
         document.getElementById('details-modal').style.display = 'flex';
     }
 
-    function setReserve(id, isReserved) {
+    function setReserve(id, res) {
         const idx = db.findIndex(x => x.id == id);
-        db[idx].status = isReserved ? 'reserved' : 'stock';
+        db[idx].status = res ? 'reserved' : 'stock';
         save(); closeModal(); renderBase(db[idx].type, document.querySelector('.filter-btn.active'));
     }
 
     function deleteItem(id) {
-        if(confirm('Вы уверены? Запись удалится из базы и статистики.')){
-            db = db.filter(x=>x.id!=id); save(); location.reload();
-        }
+        if(confirm('Удалить из базы?')) { db = db.filter(x=>x.id!=id); save(); location.reload(); }
     }
 
     function closeModal() { document.getElementById('details-modal').style.display = 'none'; }
@@ -491,6 +485,10 @@
             data: { labels: sold.map(s => ''), datasets: [{label:'Прибыль', data: sold.map(s => s.sellPrice - (s.buy+s.rep)), borderColor:'#43e97b', tension:0.4}] },
             options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
         });
+    }
+
+    function renderHistory() {
+        document.getElementById('history-list').innerHTML = logs.map(l => `<div style="padding:10px; border-bottom:1px solid #2c2c2e;"><small style="color:var(--text-dim)">${l.date}</small><br>${l.msg}</div>`).join('');
     }
 
     function downloadBackup() {
