@@ -171,6 +171,17 @@
         <div id="tab-sell" class="tab-content">
             <div class="form-group"><label>Поиск</label><input type="text" id="sell-search" placeholder="Модель или IMEI..." oninput="renderSellList()"></div>
             <div class="form-group"><label>Выбрать товар</label><select id="sell-select"></select></div>
+            
+            <div class="form-group"><label>Гарантия</label>
+                <select id="sell-warranty">
+                    <option value="Нет">Без гарантии</option>
+                    <option value="14 дней">14 дней</option>
+                    <option value="1 месяц">1 месяц</option>
+                    <option value="3 месяца">3 месяца</option>
+                    <option value="6 месяцев">6 месяцев</option>
+                </select>
+            </div>
+            
             <div class="form-group"><label>Цена продажи</label><input type="number" id="sell-price"></div>
             <button class="btn-primary" onclick="completeSell()">Продано</button>
         </div>
@@ -367,12 +378,17 @@
     function completeSell() {
         const id = document.getElementById('sell-select').value;
         const price = parseFloat(document.getElementById('sell-price').value);
+        const warranty = document.getElementById('sell-warranty').value; // Берем гарантию
+
         if(!id || !price) return alert("Укажите цену продажи!");
         const idx = db.findIndex(i => i.id == id);
+        
         db[idx].status = 'sold';
         db[idx].sellPrice = price;
+        db[idx].warranty = warranty; // Сохраняем гарантию
         db[idx].sellDate = new Date().toISOString();
-        addLog(`Продажа: ${db[idx].model} за ${price}₽`, 'out');
+        
+        addLog(`Продажа: ${db[idx].model} за ${price}₽ (Гар: ${warranty})`, 'out');
         location.reload();
     }
 
@@ -380,7 +396,15 @@
         const i = db.find(x => x.id == id);
         document.getElementById('m-title').innerText = i.model;
         document.getElementById('m-gallery').innerHTML = i.photos.length ? i.photos.map(p => `<img src="${p}" style="height:150px; border-radius:10px;">`).join('') : '<small>Нет фото</small>';
-        document.getElementById('m-details').innerHTML = `Бренд: ${i.brand}<br>IMEI/SN: ${i.imei}<br>Себестоимость: ${i.buy+i.rep}₽<br>Заметки: ${i.comment || '-'}`;
+        
+        // Показываем гарантию только если товар продан и она была указана
+        let warrantyInfo = '';
+        if (i.status === 'sold' && i.warranty) {
+            warrantyInfo = `<br><span style="color:#ffd60a">Гарантия: ${i.warranty}</span>`;
+        }
+
+        document.getElementById('m-details').innerHTML = `Бренд: ${i.brand}<br>IMEI/SN: ${i.imei}<br>Себестоимость: ${i.buy+i.rep}₽<br>Заметки: ${i.comment || '-'}${warrantyInfo}`;
+        
         document.getElementById('btn-delete-item').onclick = () => { if(confirm('Удалить запись из базы?')){db=db.filter(x=>x.id!=id); save(); location.reload();} };
         document.getElementById('details-modal').style.display = 'flex';
     }
