@@ -268,10 +268,27 @@
     let logs = JSON.parse(localStorage.getItem('fya_logs')) || [];
     let tempPhotos = [];
     let chartObj = null;
+    const YANDEX_TOKEN = 'y0__xCoxYnNBRiStT0g3ar8ohYwuY-T0AhmHkK59vsUh_dg-YVCg09-lfWuIw';
+
+    async function uploadToYandexDisk() {
+        if (!YANDEX_TOKEN) return;
+        const backupData = JSON.stringify({ db, logs });
+        const path = encodeURIComponent('/fya_backup.json');
+        try {
+            const res = await fetch(`https://cloud-api.yandex.net/v1/disk/resources/upload?path=${path}&overwrite=true`, {
+                headers: { 'Authorization': `OAuth ${YANDEX_TOKEN}` }
+            });
+            if (!res.ok) return;
+            const { href } = await res.json();
+            await fetch(href, { method: 'PUT', body: backupData });
+            console.log("☁️ Облако обновлено");
+        } catch (e) { console.error("Ошибка облака", e); }
+    }
 
     function save() {
         localStorage.setItem('fya_db', JSON.stringify(db));
         localStorage.setItem('fya_logs', JSON.stringify(logs));
+        uploadToYandexDisk();
     }
 
     function addLog(msg, type) {
@@ -315,7 +332,6 @@
         box.style.display = box.style.display === 'block' ? 'none' : 'block';
     }
 
-    // ЛОГИКА СТРОГОЙ ПРОВЕРКИ
     function toggleStrictCheck(el) {
         el.classList.toggle('good');
         validateChecklist();
@@ -327,17 +343,12 @@
         const body = document.getElementById('check-body').value;
         const akb = document.getElementById('check-akb').value;
         const buyPrice = document.getElementById('inp-buy').value;
-
-        // Кнопка активна только если: 4 галочки выбраны + экран + корпус + АКБ + цена закупа
         const isReady = (checks === 4 && screen !== "" && body !== "" && akb !== "" && buyPrice !== "");
-        
         const btn = document.getElementById('btn-add-main');
         if(isReady) {
-            btn.disabled = false;
-            btn.style.opacity = "1";
+            btn.disabled = false; btn.style.opacity = "1";
         } else {
-            btn.disabled = true;
-            btn.style.opacity = "0.5";
+            btn.disabled = true; btn.style.opacity = "0.5";
         }
     }
 
@@ -372,19 +383,16 @@
             memory: document.getElementById('b-memory')?.value || '',
             buy: buy,
             rep: parseFloat(document.getElementById('inp-repair').value || 0),
-            
-            // НОВЫЕ ПОЛЯ ИЗ ЧЕК-ЛИСТА
             akb: document.getElementById('check-akb').value,
             screen: document.getElementById('check-screen').value,
             body: document.getElementById('check-body').value,
-            
             comment: document.getElementById('inp-comment').value,
             photos: tempPhotos,
             status: 'stock',
             date: new Date().toISOString()
         };
         db.push(item);
-        addLog(`Приход: ${item.model} (АКБ: ${item.akb}%)`, 'in');
+        addLog(`Приход: ${item.model} (🔋 ${item.akb}%)`, 'in');
         location.reload();
     }
 
@@ -398,7 +406,6 @@
         const brand = document.getElementById('tr-brand').value;
         const cash = parseFloat(document.getElementById('tr-cash').value || 0);
         if(!outId || !brand) return alert("Заполните поля!");
-
         const outItem = db.find(i => i.id == outId);
         const inItem = {
             id: Date.now(), type: 'phone', brand: brand,
@@ -411,13 +418,11 @@
             comment: "Трейд-ин: " + document.getElementById('tr-comment').value,
             akb: '?', screen: '?', body: '?'
         };
-
         const idx = db.findIndex(i => i.id == outId);
         db[idx].status = 'sold';
         db[idx].sellPrice = (outItem.buy + outItem.rep);
         db[idx].sellDate = new Date().toISOString();
         db[idx].warrantyDays = 0;
-        
         db.push(inItem);
         addLog(`Обмен: отдан ${outItem.model}, принят ${inItem.model}`, 'trade');
         alert("Трейд-ин завершен"); location.reload();
@@ -436,7 +441,6 @@
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         let list = type === 'sold' ? db.filter(i => i.status === 'sold') : db.filter(i => i.type === type && i.status !== 'sold');
-        
         document.getElementById('base-list').innerHTML = list.map(i => {
             let warrantyHtml = '';
             if (i.status === 'sold') {
@@ -483,14 +487,7 @@
 
    function openModal(id) {
         const i = db.find(x => x.id == id);
-        let details = `
-            IMEI: ${i.imei}<br>
-            🔋 АКБ: ${i.akb}%<br>
-            📱 Экран: ${i.screen}<br>
-            🏗️ Корпус: ${i.body}<br>
-            Себестоимость: ${i.buy+i.rep}₽<br>
-            Заметки: ${i.comment || '-'}
-        `;
+        let details = `IMEI: ${i.imei}<br>🔋 АКБ: ${i.akb}%<br>📱 Экран: ${i.screen}<br>🏗️ Корпус: ${i.body}<br>Себестоимость: ${i.buy+i.rep}₽<br>Заметки: ${i.comment || '-'}`;
         if(i.status === 'sold') {
             const w = getWarrantyStatus(i.sellDate, i.warrantyDays);
             details += `<br><span style="color:#43e97b">Продано за: ${i.sellPrice}₽</span><br>Статус: ${w.text}`;
@@ -498,16 +495,13 @@
         document.getElementById('m-title').innerText = i.model;
         document.getElementById('m-gallery').innerHTML = i.photos.map(p => `<img src="${p}" style="height:120px; border-radius:10px;">`).join('') || 'Нет фото';
         document.getElementById('m-details').innerHTML = details;
-        
         let acts = '';
         if (i.status === 'stock') {
             acts += `<button onclick="setReserve(${i.id}, true)" class="btn-primary" style="background:var(--gold); color:black;"><i class="fa-solid fa-bookmark"></i> В резерв</button>`;
         } else if (i.status === 'reserved') {
             acts += `<button onclick="setReserve(${i.id}, false)" class="btn-primary" style="background:#2c2c2e; color:white;"><i class="fa-solid fa-circle-xmark"></i> Снять резерв</button>`;
         }
-
         acts += `<button onclick="deleteItem(${i.id})" style="margin-top:10px; padding:16px; border-radius:14px; border:1px solid rgba(255, 69, 58, 0.3); background: rgba(255, 69, 58, 0.1); color: var(--danger); font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fa-solid fa-trash-can"></i> УДАЛИТЬ ЗАПИСЬ</button>`;
-        
         document.getElementById('m-actions').innerHTML = acts;
         document.getElementById('details-modal').style.display = 'flex';
     }
