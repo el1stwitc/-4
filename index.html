@@ -106,8 +106,7 @@
 
         #checklist-box { display: none; background: #2c2c2e; padding: 15px; border-radius: 14px; margin-bottom: 15px; }
         .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-        .check-item { background: #1c1c1e; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.8rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); }
-        .check-item.bad { background: rgba(255, 69, 58, 0.2); border-color: var(--danger); color: var(--danger); }
+        .check-item { background: #1c1c1e; padding: 10px; border-radius: 8px; text-align: center; font-size: 0.8rem; cursor: pointer; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; }
         .check-item.good { background: rgba(50, 215, 75, 0.2); border-color: var(--success); color: var(--success); }
 
         #details-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); display: none; justify-content: center; align-items: center; z-index: 100; backdrop-filter: blur(10px); }
@@ -145,16 +144,32 @@
             <button class="btn-primary" style="background:#2c2c2e; color:var(--text-dim); font-size:0.8rem; margin-bottom:15px; display:flex; justify-content:center; align-items:center; gap:8px;" onclick="toggleChecklist()">
                 <i class="fa-solid fa-list-check"></i> Чек-лист проверки
             </button>
+
             <div id="checklist-box">
                 <div class="check-grid">
-                    <div class="check-item" onclick="toggleCheck(this, 'FaceID/TouchID')">FaceID / TouchID</div>
-                    <div class="check-item" onclick="toggleCheck(this, 'TrueTone')">TrueTone</div>
-                    <div class="check-item" onclick="toggleCheck(this, 'Аккумулятор')">Аккумулятор</div>
-                    <div class="check-item" onclick="toggleCheck(this, 'Камеры')">Камеры</div>
-                    <div class="check-item" onclick="toggleCheck(this, 'Микрофоны')">Микрофоны</div>
-                    <div class="check-item" onclick="toggleCheck(this, 'Динамики')">Динамики</div>
-                    <div class="check-item" onclick="toggleCheck(this, 'Связь/Wi-Fi')">Связь / Wi-Fi</div>
-                    <div class="check-item" onclick="toggleCheck(this, 'Зарядка')">Зарядка</div>
+                    <div class="check-item" onclick="toggleStrictCheck(this)">FaceID / TouchID</div>
+                    <div class="check-item" onclick="toggleStrictCheck(this)">TrueTone</div>
+                    <div class="check-item" onclick="toggleStrictCheck(this)">Камеры</div>
+                    <div class="check-item" onclick="toggleStrictCheck(this)">Связь / Wi-Fi</div>
+                </div>
+                
+                <div style="margin-top:10px; display:grid; grid-template-columns: 1fr 1fr; gap:8px;">
+                    <select id="check-screen" onchange="validateChecklist()" style="font-size:0.8rem;">
+                        <option value="">📱 Экран: ?</option>
+                        <option value="Идеал">💎 Идеал</option>
+                        <option value="Царапины">🔍 Царапины</option>
+                        <option value="Разбит">❌ Разбит</option>
+                    </select>
+                    <select id="check-body" onchange="validateChecklist()" style="font-size:0.8rem;">
+                        <option value="">🏗️ Корпус: ?</option>
+                        <option value="Идеал">💎 Идеал</option>
+                        <option value="Следы носки">🔍 Следы носки</option>
+                        <option value="Сколы">⚠️ Сколы</option>
+                    </select>
+                </div>
+
+                <div style="margin-top:8px;">
+                    <input type="number" id="check-akb" placeholder="🔋 Состояние АКБ (%)" oninput="validateChecklist()" style="font-size:0.8rem;">
                 </div>
             </div>
 
@@ -166,11 +181,11 @@
             
             <div id="dynamic-form"></div>
             <div style="display:flex; gap:12px;">
-                <div class="form-group" style="flex:1"><label>Закуп (₽)</label><input type="number" id="inp-buy"></div>
+                <div class="form-group" style="flex:1"><label>Закуп (₽)</label><input type="number" id="inp-buy" oninput="validateChecklist()"></div>
                 <div class="form-group" style="flex:1"><label>Ремонт (₽)</label><input type="number" id="inp-repair" value="0"></div>
             </div>
             <div class="form-group"><label>Заметки</label><textarea id="inp-comment" rows="2"></textarea></div>
-            <button class="btn-primary" onclick="addItem()">Добавить на склад</button>
+            <button id="btn-add-main" class="btn-primary" onclick="addItem()" disabled style="opacity:0.5;">Добавить на склад</button>
         </div>
 
         <div id="tab-trade" class="tab-content">
@@ -300,15 +315,29 @@
         box.style.display = box.style.display === 'block' ? 'none' : 'block';
     }
 
-    function toggleCheck(el, name) {
-        if(el.classList.contains('good')) {
-            el.classList.remove('good'); el.classList.add('bad');
-            const comment = document.getElementById('inp-comment');
-            comment.value += (comment.value ? "\n" : "") + name + ": Не ок";
-        } else if(el.classList.contains('bad')) {
-            el.classList.remove('bad');
+    // ЛОГИКА СТРОГОЙ ПРОВЕРКИ
+    function toggleStrictCheck(el) {
+        el.classList.toggle('good');
+        validateChecklist();
+    }
+
+    function validateChecklist() {
+        const checks = document.querySelectorAll('.check-grid .check-item.good').length;
+        const screen = document.getElementById('check-screen').value;
+        const body = document.getElementById('check-body').value;
+        const akb = document.getElementById('check-akb').value;
+        const buyPrice = document.getElementById('inp-buy').value;
+
+        // Кнопка активна только если: 4 галочки выбраны + экран + корпус + АКБ + цена закупа
+        const isReady = (checks === 4 && screen !== "" && body !== "" && akb !== "" && buyPrice !== "");
+        
+        const btn = document.getElementById('btn-add-main');
+        if(isReady) {
+            btn.disabled = false;
+            btn.style.opacity = "1";
         } else {
-            el.classList.add('good');
+            btn.disabled = true;
+            btn.style.opacity = "0.5";
         }
     }
 
@@ -333,7 +362,6 @@
 
     function addItem() {
         const buy = parseFloat(document.getElementById('inp-buy').value);
-        if(!buy) return alert("Цена закупа!");
         const item = {
             id: Date.now(),
             type: document.getElementById('add-type').value,
@@ -344,13 +372,19 @@
             memory: document.getElementById('b-memory')?.value || '',
             buy: buy,
             rep: parseFloat(document.getElementById('inp-repair').value || 0),
+            
+            // НОВЫЕ ПОЛЯ ИЗ ЧЕК-ЛИСТА
+            akb: document.getElementById('check-akb').value,
+            screen: document.getElementById('check-screen').value,
+            body: document.getElementById('check-body').value,
+            
             comment: document.getElementById('inp-comment').value,
             photos: tempPhotos,
             status: 'stock',
             date: new Date().toISOString()
         };
         db.push(item);
-        addLog(`Приход: ${item.brand} ${item.model}`, 'in');
+        addLog(`Приход: ${item.model} (АКБ: ${item.akb}%)`, 'in');
         location.reload();
     }
 
@@ -374,7 +408,8 @@
             imei: document.getElementById('tr-imei').value,
             buy: (outItem.buy + outItem.rep) - cash,
             rep: 0, status: 'stock', photos: [], date: new Date().toISOString(),
-            comment: "Трейд-ин: " + document.getElementById('tr-comment').value
+            comment: "Трейд-ин: " + document.getElementById('tr-comment').value,
+            akb: '?', screen: '?', body: '?'
         };
 
         const idx = db.findIndex(i => i.id == outId);
@@ -413,7 +448,10 @@
                     <img src="${i.photos[0] || 'https://via.placeholder.com/75'}" class="card-img">
                     <div style="flex:1">
                         <div style="font-weight:bold;">${i.brand} ${i.model}</div>
-                        <small style="color:var(--text-dim)">${i.color} | ${i.imei}</small><br>
+                        <small style="color:var(--text-dim)">
+                            🔋 ${i.akb || '?'}% | ${i.screen || '?'}<br>
+                            ${i.imei}
+                        </small><br>
                         ${warrantyHtml}
                         <div style="color:#43e97b; font-weight:800; margin-top:5px;">
                             ${i.status === 'sold' ? i.sellPrice + ' ₽' : (i.buy+i.rep) + ' ₽'}
@@ -445,7 +483,14 @@
 
    function openModal(id) {
         const i = db.find(x => x.id == id);
-        let details = `IMEI: ${i.imei}<br>Себестоимость: ${i.buy+i.rep}₽<br>Заметки: ${i.comment || '-'}`;
+        let details = `
+            IMEI: ${i.imei}<br>
+            🔋 АКБ: ${i.akb}%<br>
+            📱 Экран: ${i.screen}<br>
+            🏗️ Корпус: ${i.body}<br>
+            Себестоимость: ${i.buy+i.rep}₽<br>
+            Заметки: ${i.comment || '-'}
+        `;
         if(i.status === 'sold') {
             const w = getWarrantyStatus(i.sellDate, i.warrantyDays);
             details += `<br><span style="color:#43e97b">Продано за: ${i.sellPrice}₽</span><br>Статус: ${w.text}`;
@@ -454,25 +499,14 @@
         document.getElementById('m-gallery').innerHTML = i.photos.map(p => `<img src="${p}" style="height:120px; border-radius:10px;">`).join('') || 'Нет фото';
         document.getElementById('m-details').innerHTML = details;
         
-        // Рендерим кнопки действий
         let acts = '';
-        
         if (i.status === 'stock') {
-            acts += `<button onclick="setReserve(${i.id}, true)" class="btn-primary" style="background:var(--gold); color:black;">
-                        <i class="fa-solid fa-bookmark"></i> В резерв
-                     </button>`;
+            acts += `<button onclick="setReserve(${i.id}, true)" class="btn-primary" style="background:var(--gold); color:black;"><i class="fa-solid fa-bookmark"></i> В резерв</button>`;
         } else if (i.status === 'reserved') {
-            acts += `<button onclick="setReserve(${i.id}, false)" class="btn-primary" style="background:#2c2c2e; color:white;">
-                        <i class="fa-solid fa-circle-xmark"></i> Снять резерв
-                     </button>`;
+            acts += `<button onclick="setReserve(${i.id}, false)" class="btn-primary" style="background:#2c2c2e; color:white;"><i class="fa-solid fa-circle-xmark"></i> Снять резерв</button>`;
         }
 
-        // ГРАФИКА ДЛЯ КНОПКИ УДАЛЕНИЯ
-        acts += `
-            <button onclick="deleteItem(${i.id})" 
-                    style="margin-top:10px; padding:16px; border-radius:14px; border:1px solid rgba(255, 69, 58, 0.3); background: rgba(255, 69, 58, 0.1); color: var(--danger); font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
-                <i class="fa-solid fa-trash-can"></i> УДАЛИТЬ ЗАПИСЬ
-            </button>`;
+        acts += `<button onclick="deleteItem(${i.id})" style="margin-top:10px; padding:16px; border-radius:14px; border:1px solid rgba(255, 69, 58, 0.3); background: rgba(255, 69, 58, 0.1); color: var(--danger); font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;"><i class="fa-solid fa-trash-can"></i> УДАЛИТЬ ЗАПИСЬ</button>`;
         
         document.getElementById('m-actions').innerHTML = acts;
         document.getElementById('details-modal').style.display = 'flex';
@@ -526,5 +560,3 @@
 </script>
 </body>
 </html>
-
-
