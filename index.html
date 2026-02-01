@@ -443,7 +443,7 @@
         location.reload();
     }
 
-    function openModal(id) {
+   function openModal(id) {
         const i = db.find(x => x.id == id);
         let details = `IMEI: ${i.imei}<br>Себестоимость: ${i.buy+i.rep}₽<br>Заметки: ${i.comment || '-'}`;
         if(i.status === 'sold') {
@@ -454,9 +454,25 @@
         document.getElementById('m-gallery').innerHTML = i.photos.map(p => `<img src="${p}" style="height:120px; border-radius:10px;">`).join('') || 'Нет фото';
         document.getElementById('m-details').innerHTML = details;
         
-        let acts = i.status === 'stock' ? `<button onclick="setReserve(${i.id}, true)" class="btn-primary" style="background:var(--gold); color:black;">В резерв</button>` : 
-                   i.status === 'reserved' ? `<button onclick="setReserve(${i.id}, false)" class="btn-primary" style="background:#2c2c2e;">Снять резерв</button>` : '';
-        acts += `<button style="color:var(--danger); background:none; border:none; padding:15px; font-weight:bold;" onclick="deleteItem(${i.id})">Удалить запись</button>`;
+        // Рендерим кнопки действий
+        let acts = '';
+        
+        if (i.status === 'stock') {
+            acts += `<button onclick="setReserve(${i.id}, true)" class="btn-primary" style="background:var(--gold); color:black;">
+                        <i class="fa-solid fa-bookmark"></i> В резерв
+                     </button>`;
+        } else if (i.status === 'reserved') {
+            acts += `<button onclick="setReserve(${i.id}, false)" class="btn-primary" style="background:#2c2c2e; color:white;">
+                        <i class="fa-solid fa-circle-xmark"></i> Снять резерв
+                     </button>`;
+        }
+
+        // ГРАФИКА ДЛЯ КНОПКИ УДАЛЕНИЯ
+        acts += `
+            <button onclick="deleteItem(${i.id})" 
+                    style="margin-top:10px; padding:16px; border-radius:14px; border:1px solid rgba(255, 69, 58, 0.3); background: rgba(255, 69, 58, 0.1); color: var(--danger); font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px;">
+                <i class="fa-solid fa-trash-can"></i> УДАЛИТЬ ЗАПИСЬ
+            </button>`;
         
         document.getElementById('m-actions').innerHTML = acts;
         document.getElementById('details-modal').style.display = 'flex';
@@ -510,4 +526,5 @@
 </script>
 </body>
 </html>
+
 
