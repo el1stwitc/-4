@@ -509,6 +509,43 @@
             to { transform: scale(4); opacity: 0; }
         }
 
+    /* Листай в самый низ секции style */
+        
+        /* ... тут какие-то твои старые стили ... */
+        
+        .toast { 
+            /* например, это последний блок в твоем файле */
+        }
+
+        /* ВСТАВЛЯЙ ПРЯМО СЮДА, ПЕРЕД ЗАКРЫТИЕМ STYLE */
+        .filter-btn {
+            background: var(--card-hover);
+            color: var(--text-dim);
+            border: none;
+            padding: 10px 18px;
+            border-radius: 14px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .filter-btn.active {
+            background: var(--primary-grad);
+            color: #000;
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(67, 233, 123, 0.2);
+            border-color: transparent;
+        }
+
+        .filter-btn:active {
+            transform: scale(0.95);
+        }
     </style>
 </head>
 <body>
@@ -1114,17 +1151,25 @@
     }
 
     // --- СКЛАД И РЕНДЕР ---
-    function filterBase(cat, btn) {
-        document.querySelectorAll('#tab-base .filter-btn').forEach(b => {
-            b.classList.remove('active');
-            b.style.background = 'var(--card-hover)';
-            b.style.color = 'var(--text-dim)';
-        });
-        btn.classList.add('active');
-        btn.style.background = 'var(--primary-grad)';
-        btn.style.color = '#000';
-        renderBase(cat);
-    }
+   function filterBase(cat, btn) {
+    // 1. Убираем класс 'active' у всех кнопок (стили сбросятся сами через CSS)
+    document.querySelectorAll('#tab-base .filter-btn').forEach(b => {
+        b.classList.remove('active');
+        // Убираем ручные стили, если они там остались от старого кода
+        b.style.background = '';
+        b.style.color = '';
+    });
+    
+    // 2. Добавляем 'active' только нажатой кнопке
+    btn.classList.add('active');
+    
+    // 3. Убираем ручные стили у активной кнопки, чтобы работал CSS градиент
+    btn.style.background = '';
+    btn.style.color = '';
+
+    // 4. Обновляем список товаров
+    renderBase(cat);
+}
 
     function renderBase(filter = 'phone') {
         const list = document.getElementById('stock-list');
